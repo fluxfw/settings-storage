@@ -1,7 +1,8 @@
 import { MemorySettings } from "../Settings/MemorySettings.mjs";
-import { Settings } from "../Settings/Settings.mjs";
 import { SettingsService } from "../../Service/Settings/Port/SettingsService.mjs";
 import { StorageSettings } from "../Settings/StorageSettings.mjs";
+
+/** @typedef {import("../Settings/Settings.mjs").Settings} Settings */
 
 export class SettingsApi {
     /**
