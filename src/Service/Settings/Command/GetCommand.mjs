@@ -1,4 +1,4 @@
-import { Settings } from "../../../Adapter/Settings/Settings.mjs";
+/** @typedef {import("../../../Adapter/Settings/Settings.mjs").Settings} Settings */
 
 export class GetCommand {
     /**

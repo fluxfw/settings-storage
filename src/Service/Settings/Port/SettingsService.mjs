@@ -2,8 +2,9 @@ import { DeleteCommand } from "../Command/DeleteCommand.mjs";
 import { GetAllCommand } from "../Command/GetAllCommand.mjs";
 import { GetCommand } from "../Command/GetCommand.mjs";
 import { ResetCommand } from "../Command/ResetCommand.mjs";
-import { Settings } from "../../../Adapter/Settings/Settings.mjs";
 import { StoreCommand } from "../Command/StoreCommand.mjs";
+
+/** @typedef {import("../../../Adapter/Settings/Settings.mjs").Settings} Settings */
 
 export class SettingsService {
     /**
