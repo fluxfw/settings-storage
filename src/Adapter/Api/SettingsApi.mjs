@@ -1,8 +1,5 @@
-import { MemorySettings } from "../Settings/MemorySettings.mjs";
-import { SettingsService } from "../../Service/Settings/Port/SettingsService.mjs";
-import { StorageSettings } from "../Settings/StorageSettings.mjs";
-
 /** @typedef {import("../Settings/Settings.mjs").Settings} Settings */
+/** @typedef {import("../../Service/Settings/Port/SettingsService.mjs").SettingsService} SettingsService */
 
 export class SettingsApi {
     /**
@@ -16,19 +13,19 @@ export class SettingsApi {
 
     /**
      * @param {string} prefix
-     * @returns {SettingsApi}
+     * @returns {Promise<SettingsApi>}
      */
-    static newWithAutoSettings(prefix = "") {
+    static async newWithAutoSettings(prefix = "") {
         let settings;
 
         try {
-            settings = StorageSettings.new(
+            settings = (await import("../Settings/StorageSettings.mjs")).StorageSettings.new(
                 prefix
             );
         } catch (error) {
             console.info("Unsupported StorageSettings - Using MemorySettings fallback (", error, ")");
 
-            settings = MemorySettings.new();
+            settings = (await import("../Settings/MemorySettings.mjs")).MemorySettings.new();
         }
 
         return this.new(
@@ -58,7 +55,7 @@ export class SettingsApi {
      * @returns {Promise<void>}
      */
     async init() {
-        this.#settings_service ??= this.#getSettingsService();
+        this.#settings_service ??= await this.#getSettingsService();
     }
 
     /**
@@ -110,10 +107,10 @@ export class SettingsApi {
     }
 
     /**
-     * @returns {SettingsService}
+     * @returns {Promise<SettingsService>}
      */
-    #getSettingsService() {
-        return SettingsService.new(
+    async #getSettingsService() {
+        return (await import("../../Service/Settings/Port/SettingsService.mjs")).SettingsService.new(
             this.#settings
         );
     }
