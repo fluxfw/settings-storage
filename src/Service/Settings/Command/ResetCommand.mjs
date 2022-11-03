@@ -25,11 +25,11 @@ export class ResetCommand {
     }
 
     /**
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    reset() {
-        for (const key of Object.keys(this.#settings.getAll())) {
-            this.#settings.delete(
+    async reset() {
+        for (const key of Object.keys(await this.#settings.getAll())) {
+            await this.#settings.delete(
                 key
             );
         }

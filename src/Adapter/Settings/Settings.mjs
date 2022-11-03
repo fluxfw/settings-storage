@@ -4,7 +4,7 @@
 export class Settings {
     /**
      * @param {string} key
-     * @returns {void}
+     * @returns {Promise<void>}
      * @abstract
      */
     delete(key) {
@@ -13,7 +13,7 @@ export class Settings {
 
     /**
      * @param {string} key
-     * @returns {string | null}
+     * @returns {Promise<string | null>}
      * @abstract
      */
     get(key) {
@@ -21,7 +21,7 @@ export class Settings {
     }
 
     /**
-     * @returns {{[key: string]: string}}
+     * @returns {Promise<{[key: string]: string}>}
      * @abstract
      */
     getAll() {
@@ -31,7 +31,7 @@ export class Settings {
     /**
      * @param {string} key
      * @param {string} value
-     * @returns {void}
+     * @returns {Promise<void>}
      * @abstract
      */
     store(key, value) {

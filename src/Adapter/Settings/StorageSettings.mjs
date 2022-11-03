@@ -36,24 +36,24 @@ export class StorageSettings extends Settings {
 
     /**
      * @param {string} key
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    delete(key) {
+    async delete(key) {
         this.#storage.removeItem(`${this.#prefix}${key}`);
     }
 
     /**
      * @param {string} key
-     * @returns {string | null}
+     * @returns {Promise<string | null>}
      */
-    get(key) {
+    async get(key) {
         return this.#storage.getItem(`${this.#prefix}${key}`);
     }
 
     /**
-     * @returns {{[key: string]: string}}
+     * @returns {Promise<{[key: string]: string}>}
      */
-    getAll() {
+    async getAll() {
         return Object.fromEntries(Object.entries({
             ...this.#storage
         }).filter(([
@@ -64,9 +64,9 @@ export class StorageSettings extends Settings {
     /**
      * @param {string} key
      * @param {string} value
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    store(key, value) {
+    async store(key, value) {
         this.#storage.setItem(`${this.#prefix}${key}`, value);
     }
 }

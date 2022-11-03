@@ -24,24 +24,24 @@ export class MemorySettings extends Settings {
 
     /**
      * @param {string} key
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    delete(key) {
+    async delete(key) {
         delete this.#settings[key];
     }
 
     /**
      * @param {string} key
-     * @returns {string | null}
+     * @returns {Promise<string | null>}
      */
-    get(key) {
+    async get(key) {
         return this.#settings[key] ?? null;
     }
 
     /**
-     * @returns {{[key: string]: string}}
+     * @returns {Promise<{[key: string]: string}>}
      */
-    getAll() {
+    async getAll() {
         return {
             ...this.#settings
         };
@@ -50,9 +50,9 @@ export class MemorySettings extends Settings {
     /**
      * @param {string} key
      * @param {string} value
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    store(key, value) {
+    async store(key, value) {
         this.#settings[key] = value;
     }
 }

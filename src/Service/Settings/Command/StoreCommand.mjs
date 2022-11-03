@@ -27,10 +27,10 @@ export class StoreCommand {
     /**
      * @param {string} key
      * @param {*} value
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    store(key, value) {
-        this.#settings.store(
+    async store(key, value) {
+        await this.#settings.store(
             key,
             JSON.stringify(value)
         );

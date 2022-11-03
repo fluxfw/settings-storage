@@ -26,10 +26,10 @@ export class DeleteCommand {
 
     /**
      * @param {string} key
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    delete(key) {
-        this.#settings.delete(
+    async delete(key) {
+        await this.#settings.delete(
             key
         );
     }
