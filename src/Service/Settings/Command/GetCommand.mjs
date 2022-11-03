@@ -27,10 +27,10 @@ export class GetCommand {
     /**
      * @param {string} key
      * @param {*} default_value
-     * @returns {*}
+     * @returns {Promise<*>}
      */
-    get(key, default_value = null) {
-        const value = this.#settings.get(
+    async get(key, default_value = null) {
+        const value = await this.#settings.get(
             key
         );
 

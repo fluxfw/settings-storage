@@ -1,9 +1,3 @@
-import { DeleteCommand } from "../Command/DeleteCommand.mjs";
-import { GetAllCommand } from "../Command/GetAllCommand.mjs";
-import { GetCommand } from "../Command/GetCommand.mjs";
-import { ResetCommand } from "../Command/ResetCommand.mjs";
-import { StoreCommand } from "../Command/StoreCommand.mjs";
-
 /** @typedef {import("../../../Adapter/Settings/Settings.mjs").Settings} Settings */
 
 export class SettingsService {
@@ -32,10 +26,10 @@ export class SettingsService {
 
     /**
      * @param {string} key
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    delete(key) {
-        DeleteCommand.new(
+    async delete(key) {
+        await (await import("../Command/DeleteCommand.mjs")).DeleteCommand.new(
             this.#settings
         )
             .delete(
@@ -46,10 +40,10 @@ export class SettingsService {
     /**
      * @param {string} key
      * @param {*} default_value
-     * @returns {*}
+     * @returns {Promise<*>}
      */
-    get(key, default_value = null) {
-        return GetCommand.new(
+    async get(key, default_value = null) {
+        return (await import("../Command/GetCommand.mjs")).GetCommand.new(
             this.#settings
         )
             .get(
@@ -59,19 +53,19 @@ export class SettingsService {
     }
 
     /**
-     * @returns {{[key: string]: *}}
+     * @returns {Promise<{[key: string]: *}>}
      */
-    getAll() {
-        return GetAllCommand.new(
+    async getAll() {
+        return (await import("../Command/GetAllCommand.mjs")).GetAllCommand.new(
             this.#settings
         ).getAll();
     }
 
     /**
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    reset() {
-        ResetCommand.new(
+    async reset() {
+        await (await import("../Command/ResetCommand.mjs")).ResetCommand.new(
             this.#settings
         )
             .reset();
@@ -80,10 +74,10 @@ export class SettingsService {
     /**
      * @param {string} key
      * @param {*} value
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    store(key, value) {
-        StoreCommand.new(
+    async store(key, value) {
+        await (await import("../Command/StoreCommand.mjs")).StoreCommand.new(
             this.#settings
         )
             .store(

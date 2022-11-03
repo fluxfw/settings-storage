@@ -55,15 +55,15 @@ export class SettingsApi {
      * @returns {Promise<void>}
      */
     async init() {
-        this.#settings_service ??= await this.#getSettingsService();
+
     }
 
     /**
      * @param {string} key
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    delete(key) {
-        this.#settings_service.delete(
+    async delete(key) {
+        await (await this.#getSettingsService()).delete(
             key
         );
     }
@@ -71,36 +71,36 @@ export class SettingsApi {
     /**
      * @param {string} key
      * @param {*} default_value
-     * @returns {*}
+     * @returns {Promise<*>}
      */
-    get(key, default_value = null) {
-        return this.#settings_service.get(
+    async get(key, default_value = null) {
+        return (await this.#getSettingsService()).get(
             key,
             default_value
         );
     }
 
     /**
-     * @returns {{[key: string]: *}}
+     * @returns {Promise<{[key: string]: *}>}
      */
-    getAll() {
-        return this.#settings_service.getAll();
+    async getAll() {
+        return (await this.#getSettingsService()).getAll();
     }
 
     /**
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    reset() {
-        this.#settings_service.reset();
+    async reset() {
+        await (await this.#getSettingsService()).reset();
     }
 
     /**
      * @param {string} key
      * @param {*} value
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    store(key, value) {
-        this.#settings_service.store(
+    async store(key, value) {
+        await (await this.#getSettingsService()).store(
             key,
             value
         );
@@ -110,8 +110,10 @@ export class SettingsApi {
      * @returns {Promise<SettingsService>}
      */
     async #getSettingsService() {
-        return (await import("../../Service/Settings/Port/SettingsService.mjs")).SettingsService.new(
+        this.#settings_service ??= (await import("../../Service/Settings/Port/SettingsService.mjs")).SettingsService.new(
             this.#settings
         );
+
+        return this.#settings_service;
     }
 }

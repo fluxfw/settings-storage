@@ -25,10 +25,10 @@ export class GetAllCommand {
     }
 
     /**
-     * @returns {{[key: string]: *}}
+     * @returns {Promise<{[key: string]: *}>}
      */
-    getAll() {
-        return Object.fromEntries(Object.entries(this.#settings.getAll()).map(([
+    async getAll() {
+        return Object.fromEntries(Object.entries(await this.#settings.getAll()).map(([
             key,
             value
         ]) => [
