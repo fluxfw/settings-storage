@@ -1,54 +1,32 @@
-/** @typedef {import("../Settings/Settings.mjs").Settings} Settings */
+/** @typedef {import("../Implementation/Implementation.mjs").Implementation} Implementation */
 /** @typedef {import("../../Service/Settings/Port/SettingsService.mjs").SettingsService} SettingsService */
 
 export class SettingsApi {
     /**
-     * @type {Settings}
+     * @type {Implementation}
      */
-    #settings;
+    #implementation;
     /**
      * @type {SettingsService | null}
      */
     #settings_service = null;
 
     /**
-     * @param {string} prefix
-     * @returns {Promise<SettingsApi>}
-     */
-    static async newWithAutoSettings(prefix = "") {
-        let settings;
-
-        try {
-            settings = (await import("../Settings/StorageSettings.mjs")).StorageSettings.new(
-                prefix
-            );
-        } catch (error) {
-            console.info("Unsupported StorageSettings - Using MemorySettings fallback (", error, ")");
-
-            settings = (await import("../Settings/MemorySettings.mjs")).MemorySettings.new();
-        }
-
-        return this.new(
-            settings
-        );
-    }
-
-    /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @returns {SettingsApi}
      */
-    static new(settings) {
+    static new(implementation) {
         return new this(
-            settings
+            implementation
         );
     }
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @private
      */
-    constructor(settings) {
-        this.#settings = settings;
+    constructor(implementation) {
+        this.#implementation = implementation;
     }
 
     /**
@@ -56,6 +34,13 @@ export class SettingsApi {
      */
     async init() {
 
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async clear() {
+        await (await this.#getSettingsService()).clear();
     }
 
     /**
@@ -88,10 +73,13 @@ export class SettingsApi {
     }
 
     /**
-     * @returns {Promise<void>}
+     * @param {string} key
+     * @returns {Promise<boolean>}
      */
-    async reset() {
-        await (await this.#getSettingsService()).reset();
+    async has(key) {
+        return (await this.#getSettingsService()).has(
+            key
+        );
     }
 
     /**
@@ -111,7 +99,7 @@ export class SettingsApi {
      */
     async #getSettingsService() {
         this.#settings_service ??= (await import("../../Service/Settings/Port/SettingsService.mjs")).SettingsService.new(
-            this.#settings
+            this.#implementation
         );
 
         return this.#settings_service;

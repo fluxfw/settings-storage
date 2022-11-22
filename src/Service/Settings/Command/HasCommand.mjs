@@ -1,6 +1,6 @@
 /** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
 
-export class StoreCommand {
+export class HasCommand {
     /**
      * @type {Implementation}
      */
@@ -8,7 +8,7 @@ export class StoreCommand {
 
     /**
      * @param {Implementation} implementation
-     * @returns {StoreCommand}
+     * @returns {HasCommand}
      */
     static new(implementation) {
         return new this(
@@ -26,13 +26,11 @@ export class StoreCommand {
 
     /**
      * @param {string} key
-     * @param {*} value
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
-    async store(key, value) {
-        await this.#implementation.store(
-            key,
-            value
+    async has(key) {
+        return this.#implementation.has(
+            key
         );
     }
 }

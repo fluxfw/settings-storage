@@ -1,27 +1,37 @@
-/** @typedef {import("../../../Adapter/Settings/Settings.mjs").Settings} Settings */
+/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
 
 export class SettingsService {
     /**
-     * @type {Settings}
+     * @type {Implementation}
      */
-    #settings;
+    #implementation;
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @returns {SettingsService}
      */
-    static new(settings) {
+    static new(implementation) {
         return new this(
-            settings
+            implementation
         );
     }
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @private
      */
-    constructor(settings) {
-        this.#settings = settings;
+    constructor(implementation) {
+        this.#implementation = implementation;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async clear() {
+        await (await import("../Command/ClearCommand.mjs")).ClearCommand.new(
+            this.#implementation
+        )
+            .clear();
     }
 
     /**
@@ -30,7 +40,7 @@ export class SettingsService {
      */
     async delete(key) {
         await (await import("../Command/DeleteCommand.mjs")).DeleteCommand.new(
-            this.#settings
+            this.#implementation
         )
             .delete(
                 key
@@ -44,7 +54,7 @@ export class SettingsService {
      */
     async get(key, default_value = null) {
         return (await import("../Command/GetCommand.mjs")).GetCommand.new(
-            this.#settings
+            this.#implementation
         )
             .get(
                 key,
@@ -57,18 +67,20 @@ export class SettingsService {
      */
     async getAll() {
         return (await import("../Command/GetAllCommand.mjs")).GetAllCommand.new(
-            this.#settings
+            this.#implementation
         ).getAll();
     }
 
     /**
-     * @returns {Promise<void>}
+     * @param {string} key
+     * @returns {Promise<boolean>}
      */
-    async reset() {
-        await (await import("../Command/ResetCommand.mjs")).ResetCommand.new(
-            this.#settings
-        )
-            .reset();
+    async has(key) {
+        return (await import("../Command/HasCommand.mjs")).HasCommand.new(
+            this.#implementation
+        ).has(
+            key
+        );
     }
 
     /**
@@ -78,7 +90,7 @@ export class SettingsService {
      */
     async store(key, value) {
         await (await import("../Command/StoreCommand.mjs")).StoreCommand.new(
-            this.#settings
+            this.#implementation
         )
             .store(
                 key,

@@ -1,7 +1,15 @@
 /**
  * @interface
  */
-export class Settings {
+export class Implementation {
+    /**
+     * @returns {Promise<void>}
+     * @abstract
+     */
+    clear() {
+
+    }
+
     /**
      * @param {string} key
      * @returns {Promise<void>}
@@ -13,7 +21,7 @@ export class Settings {
 
     /**
      * @param {string} key
-     * @returns {Promise<string | null>}
+     * @returns {Promise<*>}
      * @abstract
      */
     get(key) {
@@ -21,7 +29,7 @@ export class Settings {
     }
 
     /**
-     * @returns {Promise<{[key: string]: string}>}
+     * @returns {Promise<{[key: string]: *}>}
      * @abstract
      */
     getAll() {
@@ -30,7 +38,16 @@ export class Settings {
 
     /**
      * @param {string} key
-     * @param {string} value
+     * @returns {Promise<boolean>}
+     * @abstract
+     */
+    has(key) {
+
+    }
+
+    /**
+     * @param {string} key
+     * @param {*} value
      * @returns {Promise<void>}
      * @abstract
      */
