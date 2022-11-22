@@ -1,13 +1,13 @@
-import { Settings } from "./Settings.mjs";
+import { Implementation } from "./Implementation.mjs";
 
-export class MemorySettings extends Settings {
+export class MemoryImplementation extends Implementation {
     /**
-     * @type {{[key: string]: string}}
+     * @type {{[key: string]: *}}
      */
     #settings;
 
     /**
-     * @returns {MemorySettings}
+     * @returns {MemoryImplementation}
      */
     static new() {
         return new this();
@@ -23,6 +23,13 @@ export class MemorySettings extends Settings {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async clear() {
+        this.#settings = {};
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<void>}
      */
@@ -32,14 +39,14 @@ export class MemorySettings extends Settings {
 
     /**
      * @param {string} key
-     * @returns {Promise<string | null>}
+     * @returns {Promise<*>}
      */
     async get(key) {
-        return this.#settings[key] ?? null;
+        return this.#settings[key];
     }
 
     /**
-     * @returns {Promise<{[key: string]: string}>}
+     * @returns {Promise<{[key: string]: *}>}
      */
     async getAll() {
         return {
@@ -49,7 +56,15 @@ export class MemorySettings extends Settings {
 
     /**
      * @param {string} key
-     * @param {string} value
+     * @returns {Promise<boolean>}
+     */
+    async has(key) {
+        return Object.hasOwn(this.#settings, key);
+    }
+
+    /**
+     * @param {string} key
+     * @param {*} value
      * @returns {Promise<void>}
      */
     async store(key, value) {

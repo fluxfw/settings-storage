@@ -1,6 +1,6 @@
 /** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
 
-export class StoreCommand {
+export class ClearCommand {
     /**
      * @type {Implementation}
      */
@@ -8,7 +8,7 @@ export class StoreCommand {
 
     /**
      * @param {Implementation} implementation
-     * @returns {StoreCommand}
+     * @returns {ClearCommand}
      */
     static new(implementation) {
         return new this(
@@ -25,14 +25,9 @@ export class StoreCommand {
     }
 
     /**
-     * @param {string} key
-     * @param {*} value
      * @returns {Promise<void>}
      */
-    async store(key, value) {
-        await this.#implementation.store(
-            key,
-            value
-        );
+    async clear() {
+        await this.#implementation.clear();
     }
 }

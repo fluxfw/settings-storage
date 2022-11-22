@@ -1,27 +1,27 @@
-/** @typedef {import("../../../Adapter/Settings/Settings.mjs").Settings} Settings */
+/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
 
 export class GetCommand {
     /**
-     * @type {Settings}
+     * @type {Implementation}
      */
-    #settings;
+    #implementation;
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @returns {GetCommand}
      */
-    static new(settings) {
+    static new(implementation) {
         return new this(
-            settings
+            implementation
         );
     }
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @private
      */
-    constructor(settings) {
-        this.#settings = settings;
+    constructor(implementation) {
+        this.#implementation = implementation;
     }
 
     /**
@@ -30,14 +30,8 @@ export class GetCommand {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null) {
-        const value = await this.#settings.get(
+        return await this.#implementation.get(
             key
-        );
-
-        if (value === null) {
-            return default_value;
-        }
-
-        return JSON.parse(value);
+        ) ?? default_value;
     }
 }

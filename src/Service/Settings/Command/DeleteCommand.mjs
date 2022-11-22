@@ -1,27 +1,27 @@
-/** @typedef {import("../../../Adapter/Settings/Settings.mjs").Settings} Settings */
+/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
 
 export class DeleteCommand {
     /**
-     * @type {Settings}
+     * @type {Implementation}
      */
-    #settings;
+    #implementation;
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @returns {DeleteCommand}
      */
-    static new(settings) {
+    static new(implementation) {
         return new this(
-            settings
+            implementation
         );
     }
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @private
      */
-    constructor(settings) {
-        this.#settings = settings;
+    constructor(implementation) {
+        this.#implementation = implementation;
     }
 
     /**
@@ -29,7 +29,7 @@ export class DeleteCommand {
      * @returns {Promise<void>}
      */
     async delete(key) {
-        await this.#settings.delete(
+        await this.#implementation.delete(
             key
         );
     }

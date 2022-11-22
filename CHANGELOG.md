@@ -6,6 +6,13 @@ Changes:
 
 \-
 
+## v2022-11-22-1
+
+Changes:
+
+- `IndexedDBImplementation`
+- `clear` / `has`
+
 ## v2022-11-03-1
 
 Changes:

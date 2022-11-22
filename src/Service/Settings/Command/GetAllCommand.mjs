@@ -1,39 +1,33 @@
-/** @typedef {import("../../../Adapter/Settings/Settings.mjs").Settings} Settings */
+/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
 
 export class GetAllCommand {
     /**
-     * @type {Settings}
+     * @type {Implementation}
      */
-    #settings;
+    #implementation;
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @returns {GetAllCommand}
      */
-    static new(settings) {
+    static new(implementation) {
         return new this(
-            settings
+            implementation
         );
     }
 
     /**
-     * @param {Settings} settings
+     * @param {Implementation} implementation
      * @private
      */
-    constructor(settings) {
-        this.#settings = settings;
+    constructor(implementation) {
+        this.#implementation = implementation;
     }
 
     /**
      * @returns {Promise<{[key: string]: *}>}
      */
     async getAll() {
-        return Object.fromEntries(Object.entries(await this.#settings.getAll()).map(([
-            key,
-            value
-        ]) => [
-                key,
-                JSON.parse(value)
-            ]));
+        return this.#implementation.getAll();
     }
 }
