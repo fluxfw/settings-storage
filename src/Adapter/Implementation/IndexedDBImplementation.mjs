@@ -1,5 +1,7 @@
 import { Implementation } from "./Implementation.mjs";
 
+const DATABASE_VERSION = 1;
+
 export class IndexedDBImplementation extends Implementation {
     /**
      * @type {IDBDatabase | null}
@@ -110,7 +112,11 @@ export class IndexedDBImplementation extends Implementation {
      */
     async #getDatabase() {
         if (this.#database === null) {
-            const request = indexedDB.open(this.#database_name);
+            const request = indexedDB.open(this.#database_name, DATABASE_VERSION);
+
+            request.addEventListener("blocked", () => {
+                console.warn("Update to newer database version was blocked");
+            });
 
             request.addEventListener("upgradeneeded", () => {
                 if (!request.result.objectStoreNames.contains(this.#store_name)) {

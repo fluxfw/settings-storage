@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2022-11-22-2
+
+Changes:
+
+- `getImplementation`
+
 ## v2022-11-22-1
 
 Changes:

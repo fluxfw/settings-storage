@@ -4,53 +4,33 @@ export class StorageImplementation extends Implementation {
     /**
      * @type {string}
      */
-    #prefix;
+    #key_prefix;
     /**
      * @type {Storage}
      */
     #storage;
 
     /**
-     * @param {string} prefix
-     * @returns {Promise<Implementation>}
-     */
-    static async newWithMemoryFallback(prefix = "") {
-        let implementation;
-
-        try {
-            implementation = this.new(
-                prefix
-            );
-        } catch (error) {
-            console.info("Unvailable StorageImplementation - Using MemoryImplementation fallback (", error, ")");
-
-            implementation = (await import("./MemoryImplementation.mjs")).MemoryImplementation.new();
-        }
-
-        return implementation;
-    }
-
-    /**
-     * @param {string} prefix
-     * @param {Storage | null} storage
+     * @param {string} key_prefix
+     * @param {Storage} storage
      * @returns {StorageImplementation}
      */
-    static new(prefix = "", storage = null) {
+    static new(key_prefix = "", storage) {
         return new this(
-            prefix,
-            storage ?? localStorage
+            key_prefix,
+            storage
         );
     }
 
     /**
-     * @param {string} prefix
+     * @param {string} key_prefix
      * @param {Storage} storage
      * @private
      */
-    constructor(prefix, storage) {
+    constructor(key_prefix, storage) {
         super();
 
-        this.#prefix = prefix;
+        this.#key_prefix = key_prefix;
         this.#storage = storage;
     }
 
@@ -70,7 +50,7 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<void>}
      */
     async delete(key) {
-        this.#storage.removeItem(`${this.#prefix}${key}`);
+        this.#storage.removeItem(`${this.#key_prefix}${key}`);
     }
 
     /**
@@ -78,7 +58,7 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<*>}
      */
     async get(key) {
-        const value = this.#storage.getItem(`${this.#prefix}${key}`);
+        const value = this.#storage.getItem(`${this.#key_prefix}${key}`);
 
         if (value === null) {
             return null;
@@ -105,7 +85,7 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<boolean>}
      */
     async has(key) {
-        return this.#storage.getItem(`${this.#prefix}${key}`) !== null;
+        return this.#storage.getItem(`${this.#key_prefix}${key}`) !== null;
     }
 
     /**
@@ -114,7 +94,7 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<void>}
      */
     async store(key, value) {
-        this.#storage.setItem(`${this.#prefix}${key}`, JSON.stringify(value));
+        this.#storage.setItem(`${this.#key_prefix}${key}`, JSON.stringify(value));
     }
 
     /**
@@ -125,6 +105,6 @@ export class StorageImplementation extends Implementation {
             ...this.#storage
         }).filter(([
             key
-        ]) => key.startsWith(this.#prefix));
+        ]) => key.startsWith(this.#key_prefix));
     }
 }
