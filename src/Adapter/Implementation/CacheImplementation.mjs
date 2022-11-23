@@ -1,0 +1,119 @@
+import { CONTENT_TYPE_JSON } from "../../../../flux-fetch-api/src/Adapter/ContentType/CONTENT_TYPE.mjs";
+import { HEADER_CONTENT_TYPE } from "../../../../flux-fetch-api/src/Adapter/Header/HEADER.mjs";
+import { Implementation } from "./Implementation.mjs";
+
+const KEY_QUERY_PARAM = "key";
+
+export class CacheImplementation extends Implementation {
+    /**
+     * @type {Cache | null}
+     */
+    #cache = null;
+    /**
+     * @type {string}
+     */
+    #cache_name;
+
+    /**
+     * @param {string} cache_name
+     * @returns {CacheImplementation}
+     */
+    static new(cache_name) {
+        return new this(
+            cache_name
+        );
+    }
+
+    /**
+     * @param {string} cache_name
+     * @private
+     */
+    constructor(cache_name) {
+        super();
+
+        this.#cache_name = cache_name;
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async clear() {
+        this.#cache = null;
+
+        caches.delete(this.#cache_name);
+    }
+
+    /**
+     * @param {string} key
+     * @returns {Promise<void>}
+     */
+    async delete(key) {
+        await (await this.#getCache()).delete(this.#getUrl(
+            key
+        ));
+    }
+
+    /**
+     * @param {string} key
+     * @returns {Promise<*>}
+     */
+    async get(key) {
+        return (await (await this.#getCache()).match(this.#getUrl(
+            key
+        )))?.json();
+    }
+
+    /**
+     * @returns {Promise<{[key: string]: *}>}
+     */
+    async getAll() {
+        const cache = await this.#getCache();
+
+        return Object.fromEntries(await Promise.all((await cache.keys()).map(async request => [
+            new URL(request.url).searchParams.get(KEY_QUERY_PARAM),
+            await (await cache.match(request)).json()
+        ])));
+    }
+
+    /**
+     * @param {string} key
+     * @returns {Promise<boolean>}
+     */
+    async has(key) {
+        return (await (await this.#getCache()).keys()).some(request => new URL(request.url).searchParams.get(KEY_QUERY_PARAM) === key);
+    }
+
+    /**
+     * @param {string} key
+     * @param {*} value
+     * @returns {Promise<void>}
+     */
+    async store(key, value) {
+        await (await this.#getCache()).put(this.#getUrl(
+            key
+        ), "json" in Response ? Response.json(value) : new Response(JSON.stringify(value), {
+            headers: {
+                [HEADER_CONTENT_TYPE]: CONTENT_TYPE_JSON
+            }
+        }));
+    }
+
+    /**
+     * @returns {Promise<Cache>}
+     */
+    async #getCache() {
+        this.#cache ??= await caches.open(this.#cache_name);
+
+        return this.#cache;
+    }
+
+    /**
+     * @param {string} key
+     * @returns {string}
+     */
+    #getUrl(key) {
+        const search_params = new URLSearchParams();
+        search_params.set(KEY_QUERY_PARAM, key);
+        return `/?${search_params}`;
+    }
+}
