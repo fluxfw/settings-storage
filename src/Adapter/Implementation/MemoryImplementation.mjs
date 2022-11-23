@@ -42,16 +42,14 @@ export class MemoryImplementation extends Implementation {
      * @returns {Promise<*>}
      */
     async get(key) {
-        return this.#settings[key];
+        return structuredClone(this.#settings[key]);
     }
 
     /**
      * @returns {Promise<{[key: string]: *}>}
      */
     async getAll() {
-        return {
-            ...this.#settings
-        };
+        return structuredClone(this.#settings);
     }
 
     /**
@@ -68,6 +66,6 @@ export class MemoryImplementation extends Implementation {
      * @returns {Promise<void>}
      */
     async store(key, value) {
-        this.#settings[key] = value;
+        this.#settings[key] = structuredClone(value);
     }
 }

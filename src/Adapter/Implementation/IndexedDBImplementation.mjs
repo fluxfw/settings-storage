@@ -127,6 +127,18 @@ export class IndexedDBImplementation extends Implementation {
             this.#database = await this.#requestToPromise(
                 request
             );
+
+            this.#database.addEventListener("abort", e => {
+                console.error(e);
+            });
+
+            this.#database.addEventListener("error", e => {
+                console.error(e);
+            });
+
+            this.#database.addEventListener("versionchange", () => {
+                console.warn("Update to newer database version without reload page is not supported");
+            });
         }
 
         return this.#database;
@@ -148,9 +160,19 @@ export class IndexedDBImplementation extends Implementation {
     async #getStore(readonly) {
         const database = await this.#getDatabase();
 
-        return database.transaction([
+        const transaction = database.transaction([
             this.#store_name
-        ], readonly ? "readonly" : "readwrite").objectStore(this.#store_name);
+        ], readonly ? "readonly" : "readwrite");
+
+        transaction.addEventListener("abort", e => {
+            console.error(e, transaction.error);
+        });
+
+        transaction.addEventListener("error", e => {
+            console.error(e, transaction.error);
+        });
+
+        return transaction.objectStore(this.#store_name);
     }
 
     /**

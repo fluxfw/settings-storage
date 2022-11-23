@@ -1,17 +1,18 @@
 /** @typedef {import("./Implementation.mjs").Implementation} Implementation */
 
 /**
- * @param {string} indexdb_database_name
- * @param {string} indexdb_store_name
- * @param {string} storage_key_prefix
+ * @param {string | null} indexeddb_database_name
+ * @param {string | null} indexeddb_store_name
+ * @param {string | null} storage_key_prefix
+ * @param {string | null} cache_cache_name
  * @returns {Promise<Implementation>}
  */
-export async function getImplementation(indexdb_database_name, indexdb_store_name, storage_key_prefix) {
+export async function getImplementation(indexeddb_database_name = null, indexeddb_store_name = null, storage_key_prefix = null, cache_cache_name = null) {
     try {
-        if ((indexedDB ?? null) !== null && (indexedDB.open ?? null) !== null) {
+        if (indexeddb_database_name !== null && indexeddb_store_name !== null && (globalThis.indexedDB?.open ?? null) !== null) {
             return (await import("./IndexedDBImplementation.mjs")).IndexedDBImplementation.new(
-                indexdb_database_name,
-                indexdb_store_name
+                indexeddb_database_name,
+                indexeddb_store_name
             );
         }
     } catch (error) {
@@ -19,7 +20,7 @@ export async function getImplementation(indexdb_database_name, indexdb_store_nam
     }
 
     try {
-        if ((localStorage ?? null) !== null) {
+        if (storage_key_prefix !== null && (globalThis.localStorage ?? null) !== null) {
             return (await import("./StorageImplementation.mjs")).StorageImplementation.new(
                 storage_key_prefix,
                 localStorage
@@ -29,7 +30,17 @@ export async function getImplementation(indexdb_database_name, indexdb_store_nam
         console.error(error);
     }
 
-    console.warn("Unavailable IndexedDBImplementation or StorageImplementation - Using MemoryImplementation fallback");
+    try {
+        if (cache_cache_name !== null && (globalThis.caches?.open ?? null) !== null) {
+            return (await import("./CacheImplementation.mjs")).CacheImplementation.new(
+                cache_cache_name
+            );
+        }
+    } catch (error) {
+        console.error(error);
+    }
+
+    console.warn("Neither IndexedDBImplementation nor StorageImplementation nor CacheImplementation are available - Using MemoryImplementation fallback");
 
     return (await import("./MemoryImplementation.mjs")).MemoryImplementation.new();
 }

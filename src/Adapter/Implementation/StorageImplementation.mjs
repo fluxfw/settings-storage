@@ -15,7 +15,7 @@ export class StorageImplementation extends Implementation {
      * @param {Storage} storage
      * @returns {StorageImplementation}
      */
-    static new(key_prefix = "", storage) {
+    static new(key_prefix, storage) {
         return new this(
             key_prefix,
             storage
@@ -50,7 +50,9 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<void>}
      */
     async delete(key) {
-        this.#storage.removeItem(`${this.#key_prefix}${key}`);
+        this.#storage.removeItem(this.#getKey(
+            key
+        ));
     }
 
     /**
@@ -58,7 +60,9 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<*>}
      */
     async get(key) {
-        const value = this.#storage.getItem(`${this.#key_prefix}${key}`);
+        const value = this.#storage.getItem(this.#getKey(
+            key
+        ));
 
         if (value === null) {
             return null;
@@ -85,7 +89,9 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<boolean>}
      */
     async has(key) {
-        return this.#storage.getItem(`${this.#key_prefix}${key}`) !== null;
+        return this.#storage.getItem(this.#getKey(
+            key
+        )) !== null;
     }
 
     /**
@@ -94,7 +100,9 @@ export class StorageImplementation extends Implementation {
      * @returns {Promise<void>}
      */
     async store(key, value) {
-        this.#storage.setItem(`${this.#key_prefix}${key}`, JSON.stringify(value));
+        this.#storage.setItem(this.#getKey(
+            key
+        ), JSON.stringify(value));
     }
 
     /**
@@ -106,5 +114,13 @@ export class StorageImplementation extends Implementation {
         }).filter(([
             key
         ]) => key.startsWith(this.#key_prefix));
+    }
+
+    /**
+     * @param {string} key
+     * @returns {string}
+     */
+    #getKey(key) {
+        return `${this.#key_prefix}${key}`;
     }
 }
