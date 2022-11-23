@@ -114,8 +114,8 @@ export class IndexedDBImplementation extends Implementation {
         if (this.#database === null) {
             const request = indexedDB.open(this.#database_name, DATABASE_VERSION);
 
-            request.addEventListener("blocked", () => {
-                console.warn("Update to newer database version was blocked");
+            request.addEventListener("blocked", e => {
+                console.error(e);
             });
 
             request.addEventListener("upgradeneeded", () => {
@@ -136,8 +136,8 @@ export class IndexedDBImplementation extends Implementation {
                 console.error(e);
             });
 
-            this.#database.addEventListener("versionchange", () => {
-                console.warn("Update to newer database version without reload page is not supported");
+            this.#database.addEventListener("versionchange", e => {
+                console.error(e);
             });
         }
 
@@ -167,6 +167,10 @@ export class IndexedDBImplementation extends Implementation {
         transaction.addEventListener("abort", e => {
             console.error(e, transaction.error);
         });
+
+        /*transaction.addEventListener("complete", () => {
+
+        });*/
 
         transaction.addEventListener("error", e => {
             console.error(e, transaction.error);
