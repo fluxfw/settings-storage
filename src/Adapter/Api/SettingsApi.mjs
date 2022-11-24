@@ -32,13 +32,6 @@ export class SettingsApi {
     /**
      * @returns {Promise<void>}
      */
-    async init() {
-
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
     async clear() {
         await (await this.#getSettingsService()).clear();
     }
