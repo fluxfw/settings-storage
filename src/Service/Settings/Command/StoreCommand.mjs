@@ -1,27 +1,27 @@
-/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
+/** @typedef {import("../../../Adapter/StorageImplementation/StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 export class StoreCommand {
     /**
-     * @type {Implementation}
+     * @type {StorageImplementation}
      */
-    #implementation;
+    #storage_implementation;
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @returns {StoreCommand}
      */
-    static new(implementation) {
+    static new(storage_implementation) {
         return new this(
-            implementation
+            storage_implementation
         );
     }
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @private
      */
-    constructor(implementation) {
-        this.#implementation = implementation;
+    constructor(storage_implementation) {
+        this.#storage_implementation = storage_implementation;
     }
 
     /**
@@ -30,7 +30,7 @@ export class StoreCommand {
      * @returns {Promise<void>}
      */
     async store(key, value) {
-        await this.#implementation.store(
+        await this.#storage_implementation.store(
             key,
             value
         );

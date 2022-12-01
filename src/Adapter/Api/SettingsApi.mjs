@@ -1,32 +1,32 @@
-/** @typedef {import("../Implementation/Implementation.mjs").Implementation} Implementation */
 /** @typedef {import("../../Service/Settings/Port/SettingsService.mjs").SettingsService} SettingsService */
+/** @typedef {import("../StorageImplementation/StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 export class SettingsApi {
-    /**
-     * @type {Implementation}
-     */
-    #implementation;
     /**
      * @type {SettingsService | null}
      */
     #settings_service = null;
+    /**
+     * @type {StorageImplementation}
+     */
+    #storage_implementation;
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @returns {SettingsApi}
      */
-    static new(implementation) {
+    static new(storage_implementation) {
         return new this(
-            implementation
+            storage_implementation
         );
     }
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @private
      */
-    constructor(implementation) {
-        this.#implementation = implementation;
+    constructor(storage_implementation) {
+        this.#storage_implementation = storage_implementation;
     }
 
     /**
@@ -92,7 +92,7 @@ export class SettingsApi {
      */
     async #getSettingsService() {
         this.#settings_service ??= (await import("../../Service/Settings/Port/SettingsService.mjs")).SettingsService.new(
-            this.#implementation
+            this.#storage_implementation
         );
 
         return this.#settings_service;

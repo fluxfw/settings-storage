@@ -1,27 +1,27 @@
-/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
+/** @typedef {import("../../../Adapter/StorageImplementation/StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 export class DeleteCommand {
     /**
-     * @type {Implementation}
+     * @type {StorageImplementation}
      */
-    #implementation;
+    #storage_implementation;
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @returns {DeleteCommand}
      */
-    static new(implementation) {
+    static new(storage_implementation) {
         return new this(
-            implementation
+            storage_implementation
         );
     }
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @private
      */
-    constructor(implementation) {
-        this.#implementation = implementation;
+    constructor(storage_implementation) {
+        this.#storage_implementation = storage_implementation;
     }
 
     /**
@@ -29,7 +29,7 @@ export class DeleteCommand {
      * @returns {Promise<void>}
      */
     async delete(key) {
-        await this.#implementation.delete(
+        await this.#storage_implementation.delete(
             key
         );
     }

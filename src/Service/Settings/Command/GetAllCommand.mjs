@@ -1,33 +1,33 @@
-/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
+/** @typedef {import("../../../Adapter/StorageImplementation/StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 export class GetAllCommand {
     /**
-     * @type {Implementation}
+     * @type {StorageImplementation}
      */
-    #implementation;
+    #storage_implementation;
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @returns {GetAllCommand}
      */
-    static new(implementation) {
+    static new(storage_implementation) {
         return new this(
-            implementation
+            storage_implementation
         );
     }
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @private
      */
-    constructor(implementation) {
-        this.#implementation = implementation;
+    constructor(storage_implementation) {
+        this.#storage_implementation = storage_implementation;
     }
 
     /**
      * @returns {Promise<{[key: string]: *}>}
      */
     async getAll() {
-        return this.#implementation.getAll();
+        return this.#storage_implementation.getAll();
     }
 }

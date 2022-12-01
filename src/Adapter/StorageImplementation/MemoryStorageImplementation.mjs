@@ -1,13 +1,13 @@
-import { Implementation } from "./Implementation.mjs";
+import { StorageImplementation } from "./StorageImplementation.mjs";
 
-export class MemoryImplementation extends Implementation {
+export class MemoryStorageImplementation extends StorageImplementation {
     /**
      * @type {{[key: string]: *}}
      */
     #settings;
 
     /**
-     * @returns {MemoryImplementation}
+     * @returns {MemoryStorageImplementation}
      */
     static new() {
         return new this();

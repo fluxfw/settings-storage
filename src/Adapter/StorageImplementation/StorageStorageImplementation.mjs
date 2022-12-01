@@ -1,6 +1,6 @@
-import { Implementation } from "./Implementation.mjs";
+import { StorageImplementation } from "./StorageImplementation.mjs";
 
-export class StorageImplementation extends Implementation {
+export class StorageStorageImplementation extends StorageImplementation {
     /**
      * @type {string}
      */
@@ -13,7 +13,7 @@ export class StorageImplementation extends Implementation {
     /**
      * @param {string} key_prefix
      * @param {Storage} storage
-     * @returns {StorageImplementation}
+     * @returns {StorageStorageImplementation}
      */
     static new(key_prefix, storage) {
         return new this(

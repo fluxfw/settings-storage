@@ -1,49 +1,39 @@
 /**
  * @interface
  */
-export class Implementation {
+export class StorageImplementation {
     /**
      * @returns {Promise<void>}
      * @abstract
      */
-    clear() {
-
-    }
+    clear() { }
 
     /**
      * @param {string} key
      * @returns {Promise<void>}
      * @abstract
      */
-    delete(key) {
-
-    }
+    delete(key) { }
 
     /**
      * @param {string} key
      * @returns {Promise<*>}
      * @abstract
      */
-    get(key) {
-
-    }
+    get(key) { }
 
     /**
      * @returns {Promise<{[key: string]: *}>}
      * @abstract
      */
-    getAll() {
-
-    }
+    getAll() { }
 
     /**
      * @param {string} key
      * @returns {Promise<boolean>}
      * @abstract
      */
-    has(key) {
-
-    }
+    has(key) { }
 
     /**
      * @param {string} key
@@ -51,7 +41,5 @@ export class Implementation {
      * @returns {Promise<void>}
      * @abstract
      */
-    store(key, value) {
-
-    }
+    store(key, value) { }
 }
