@@ -1,10 +1,10 @@
 import { CONTENT_TYPE_JSON } from "../../../../flux-fetch-api/src/Adapter/ContentType/CONTENT_TYPE.mjs";
 import { HEADER_CONTENT_TYPE } from "../../../../flux-fetch-api/src/Adapter/Header/HEADER.mjs";
-import { Implementation } from "./Implementation.mjs";
+import { StorageImplementation } from "./StorageImplementation.mjs";
 
 const KEY_QUERY_PARAM = "key";
 
-export class CacheImplementation extends Implementation {
+export class CacheStorageImplementation extends StorageImplementation {
     /**
      * @type {Cache | null}
      */
@@ -16,7 +16,7 @@ export class CacheImplementation extends Implementation {
 
     /**
      * @param {string} cache_name
-     * @returns {CacheImplementation}
+     * @returns {CacheStorageImplementation}
      */
     static new(cache_name) {
         return new this(

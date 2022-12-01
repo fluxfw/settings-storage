@@ -1,27 +1,27 @@
-/** @typedef {import("../../../Adapter/Implementation/Implementation.mjs").Implementation} Implementation */
+/** @typedef {import("../../../Adapter/StorageImplementation/StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 export class SettingsService {
     /**
-     * @type {Implementation}
+     * @type {StorageImplementation}
      */
-    #implementation;
+    #storage_implementation;
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @returns {SettingsService}
      */
-    static new(implementation) {
+    static new(storage_implementation) {
         return new this(
-            implementation
+            storage_implementation
         );
     }
 
     /**
-     * @param {Implementation} implementation
+     * @param {StorageImplementation} storage_implementation
      * @private
      */
-    constructor(implementation) {
-        this.#implementation = implementation;
+    constructor(storage_implementation) {
+        this.#storage_implementation = storage_implementation;
     }
 
     /**
@@ -29,7 +29,7 @@ export class SettingsService {
      */
     async clear() {
         await (await import("../Command/ClearCommand.mjs")).ClearCommand.new(
-            this.#implementation
+            this.#storage_implementation
         )
             .clear();
     }
@@ -40,7 +40,7 @@ export class SettingsService {
      */
     async delete(key) {
         await (await import("../Command/DeleteCommand.mjs")).DeleteCommand.new(
-            this.#implementation
+            this.#storage_implementation
         )
             .delete(
                 key
@@ -54,7 +54,7 @@ export class SettingsService {
      */
     async get(key, default_value = null) {
         return (await import("../Command/GetCommand.mjs")).GetCommand.new(
-            this.#implementation
+            this.#storage_implementation
         )
             .get(
                 key,
@@ -67,7 +67,7 @@ export class SettingsService {
      */
     async getAll() {
         return (await import("../Command/GetAllCommand.mjs")).GetAllCommand.new(
-            this.#implementation
+            this.#storage_implementation
         ).getAll();
     }
 
@@ -77,7 +77,7 @@ export class SettingsService {
      */
     async has(key) {
         return (await import("../Command/HasCommand.mjs")).HasCommand.new(
-            this.#implementation
+            this.#storage_implementation
         ).has(
             key
         );
@@ -90,7 +90,7 @@ export class SettingsService {
      */
     async store(key, value) {
         await (await import("../Command/StoreCommand.mjs")).StoreCommand.new(
-            this.#implementation
+            this.#storage_implementation
         )
             .store(
                 key,
