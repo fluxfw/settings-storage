@@ -1,6 +1,6 @@
-import { StorageImplementation } from "./StorageImplementation.mjs";
+import { StorageImplementation } from "../StorageImplementation.mjs";
 
-export class StorageStorageImplementation extends StorageImplementation {
+export class StorageBrowserStorageImplementation extends StorageImplementation {
     /**
      * @type {string}
      */
@@ -13,7 +13,7 @@ export class StorageStorageImplementation extends StorageImplementation {
     /**
      * @param {string} key_prefix
      * @param {Storage} storage
-     * @returns {StorageStorageImplementation}
+     * @returns {StorageBrowserStorageImplementation}
      */
     static new(key_prefix, storage) {
         return new this(

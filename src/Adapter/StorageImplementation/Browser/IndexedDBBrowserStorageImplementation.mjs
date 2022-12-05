@@ -1,8 +1,8 @@
-import { StorageImplementation } from "./StorageImplementation.mjs";
+import { StorageImplementation } from "../StorageImplementation.mjs";
 
 const DATABASE_VERSION = 1;
 
-export class IndexedDBStorageImplementation extends StorageImplementation {
+export class IndexedDBBrowserStorageImplementation extends StorageImplementation {
     /**
      * @type {IDBDatabase | null}
      */
@@ -19,7 +19,7 @@ export class IndexedDBStorageImplementation extends StorageImplementation {
     /**
      * @param {string} database_name
      * @param {string} store_name
-     * @returns {IndexedDBStorageImplementation}
+     * @returns {IndexedDBBrowserStorageImplementation}
      */
     static new(database_name, store_name) {
         return new this(

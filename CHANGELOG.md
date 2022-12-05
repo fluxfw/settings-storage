@@ -6,6 +6,13 @@ Changes:
 
 \-
 
+## v2022-12-05-1
+
+Changes:
+
+- NodeJs implementations (Json file, mongo db collection)
+- Renamed browser implementations
+
 ## v2022-12-01-1
 
 Changes:

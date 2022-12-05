@@ -1,12 +1,15 @@
 {
     "name": "flux-settings-api",
     "productName": "flux-settings-api",
-    "version": "2022-12-01-1",
+    "version": "2022-12-05-1",
     "description": "",
     "keywords": [],
     "homepage": "",
     "peerDependencies": {
         "flux-fetch-api": "*"
+    },
+    "optionalDependencies": {
+        "mongodb": "*"
     },
     "private": true
 }
