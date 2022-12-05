@@ -2,21 +2,11 @@
 /** @typedef {import("./StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 /**
- * @param {string | null} json_file_path
  * @param {Collection | null} mongo_db_collection
+ * @param {string | null} json_file_path
  * @returns {Promise<StorageImplementation>}
  */
-export async function getNodeJsStorageImplementation(json_file_path = null, mongo_db_collection = null) {
-    try {
-        if (json_file_path !== null) {
-            return (await import("./NodeJs/JsonFileNodeJsStorageImplementation.mjs")).JsonFileNodeJsStorageImplementation.new(
-                json_file_path
-            );
-        }
-    } catch (error) {
-        console.error(error);
-    }
-
+export async function getNodeJsStorageImplementation(mongo_db_collection = null, json_file_path = null) {
     try {
         if (mongo_db_collection !== null) {
             return (await import("./NodeJs/MongoDbNodeJsStorageImplementation.mjs")).MongoDbNodeJsStorageImplementation.new(
@@ -27,7 +17,17 @@ export async function getNodeJsStorageImplementation(json_file_path = null, mong
         console.error(error);
     }
 
-    console.warn("Neither JsonFileNodeJsStorageImplementation nor MongoDbNodeJsStorageImplementation are available - Using MemoryStorageImplementation fallback");
+    try {
+        if (json_file_path !== null) {
+            return (await import("./NodeJs/JsonFileNodeJsStorageImplementation.mjs")).JsonFileNodeJsStorageImplementation.new(
+                json_file_path
+            );
+        }
+    } catch (error) {
+        console.error(error);
+    }
+
+    console.warn("Neither MongoDbNodeJsStorageImplementation nor JsonFileNodeJsStorageImplementation are available - Using MemoryStorageImplementation fallback");
 
     return (await import("./MemoryStorageImplementation.mjs")).MemoryStorageImplementation.new();
 }
