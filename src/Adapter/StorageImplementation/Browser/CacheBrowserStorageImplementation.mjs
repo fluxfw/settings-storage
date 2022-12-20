@@ -84,6 +84,13 @@ export class CacheBrowserStorageImplementation extends StorageImplementation {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async init() {
+        await this.#getCache();
+    }
+
+    /**
      * @param {string} key
      * @param {*} value
      * @returns {Promise<void>}

@@ -97,6 +97,13 @@ export class IndexedDBBrowserStorageImplementation extends StorageImplementation
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async init() {
+        await this.#getDatabase();
+    }
+
+    /**
      * @param {string} key
      * @param {*} value
      * @returns {Promise<void>}
