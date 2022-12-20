@@ -1,5 +1,5 @@
 /** @typedef {import("mongodb").Collection} Collection */
-/** @typedef {import("./StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 /**
  * @param {Collection | null} mongo_db_collection
@@ -9,7 +9,7 @@
 export async function getNodeJsStorageImplementation(mongo_db_collection = null, json_file_path = null) {
     try {
         if (mongo_db_collection !== null) {
-            return (await import("./NodeJs/MongoDbNodeJsStorageImplementation.mjs")).MongoDbNodeJsStorageImplementation.new(
+            return (await import("./MongoDbNodeJsStorageImplementation.mjs")).MongoDbNodeJsStorageImplementation.new(
                 mongo_db_collection
             );
         }
@@ -19,7 +19,7 @@ export async function getNodeJsStorageImplementation(mongo_db_collection = null,
 
     try {
         if (json_file_path !== null) {
-            const storage_implementation = (await import("./NodeJs/JsonFileNodeJsStorageImplementation.mjs")).JsonFileNodeJsStorageImplementation.new(
+            const storage_implementation = (await import("./JsonFileNodeJsStorageImplementation.mjs")).JsonFileNodeJsStorageImplementation.new(
                 json_file_path
             );
             await storage_implementation.init();
@@ -31,5 +31,5 @@ export async function getNodeJsStorageImplementation(mongo_db_collection = null,
 
     console.warn("Neither MongoDbNodeJsStorageImplementation nor JsonFileNodeJsStorageImplementation are available - Using MemoryStorageImplementation fallback");
 
-    return (await import("./MemoryStorageImplementation.mjs")).MemoryStorageImplementation.new();
+    return (await import("../MemoryStorageImplementation.mjs")).MemoryStorageImplementation.new();
 }
