@@ -19,9 +19,11 @@ export async function getNodeJsStorageImplementation(mongo_db_collection = null,
 
     try {
         if (json_file_path !== null) {
-            return (await import("./NodeJs/JsonFileNodeJsStorageImplementation.mjs")).JsonFileNodeJsStorageImplementation.new(
+            const storage_implementation = (await import("./NodeJs/JsonFileNodeJsStorageImplementation.mjs")).JsonFileNodeJsStorageImplementation.new(
                 json_file_path
             );
+            await storage_implementation.init();
+            return storage_implementation;
         }
     } catch (error) {
         console.error("Try using JsonFileNodeJsStorageImplementation failed (", error, ")");
