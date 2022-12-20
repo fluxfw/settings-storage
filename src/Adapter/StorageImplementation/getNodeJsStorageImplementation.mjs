@@ -14,7 +14,7 @@ export async function getNodeJsStorageImplementation(mongo_db_collection = null,
             );
         }
     } catch (error) {
-        console.error(error);
+        console.error("Try using MongoDbNodeJsStorageImplementation failed (", error, ")");
     }
 
     try {
@@ -24,7 +24,7 @@ export async function getNodeJsStorageImplementation(mongo_db_collection = null,
             );
         }
     } catch (error) {
-        console.error(error);
+        console.error("Try using JsonFileNodeJsStorageImplementation failed (", error, ")");
     }
 
     console.warn("Neither MongoDbNodeJsStorageImplementation nor JsonFileNodeJsStorageImplementation are available - Using MemoryStorageImplementation fallback");

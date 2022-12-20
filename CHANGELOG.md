@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2022-12-20-1
+
+Changes:
+
+- Fix fallbacks for private mode may not work
+
 ## v2022-12-08-1
 
 Changes:
