@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2022-12-20-3
+
+Changes:
+
+- Move `getImplementation`
+
 ## v2022-12-20-2
 
 Changes:

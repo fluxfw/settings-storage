@@ -1,4 +1,4 @@
-/** @typedef {import("./StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 /**
  * @param {string | null} indexeddb_database_name
@@ -10,7 +10,7 @@
 export async function getBrowserStorageImplementation(indexeddb_database_name = null, indexeddb_store_name = null, cache_cache_name = null, storage_key_prefix = null) {
     try {
         if (indexeddb_database_name !== null && indexeddb_store_name !== null && (globalThis.indexedDB?.open ?? null) !== null) {
-            const storage_implementation = (await import("./Browser/IndexedDBBrowserStorageImplementation.mjs")).IndexedDBBrowserStorageImplementation.new(
+            const storage_implementation = (await import("./IndexedDBBrowserStorageImplementation.mjs")).IndexedDBBrowserStorageImplementation.new(
                 indexeddb_database_name,
                 indexeddb_store_name
             );
@@ -23,7 +23,7 @@ export async function getBrowserStorageImplementation(indexeddb_database_name = 
 
     try {
         if (cache_cache_name !== null && (globalThis.caches?.open ?? null) !== null) {
-            const storage_implementation = (await import("./Browser/CacheBrowserStorageImplementation.mjs")).CacheBrowserStorageImplementation.new(
+            const storage_implementation = (await import("./CacheBrowserStorageImplementation.mjs")).CacheBrowserStorageImplementation.new(
                 cache_cache_name
             );
             await storage_implementation.init();
@@ -37,7 +37,7 @@ export async function getBrowserStorageImplementation(indexeddb_database_name = 
         if (storage_key_prefix !== null && (globalThis.localStorage ?? null) !== null) {
             console.warn("Using StorageStorageImplementation - Big/mutch data may not work");
 
-            return (await import("./Browser/StorageBrowserStorageImplementation.mjs")).StorageBrowserStorageImplementation.new(
+            return (await import("./StorageBrowserStorageImplementation.mjs")).StorageBrowserStorageImplementation.new(
                 storage_key_prefix,
                 localStorage
             );
@@ -48,5 +48,5 @@ export async function getBrowserStorageImplementation(indexeddb_database_name = 
 
     console.warn("Neither IndexedDBBrowserStorageImplementation nor CacheBrowserStorageImplementation nor StorageBrowserStorageImplementation are available - Using MemoryStorageImplementation fallback");
 
-    return (await import("./MemoryStorageImplementation.mjs")).MemoryStorageImplementation.new();
+    return (await import("../MemoryStorageImplementation.mjs")).MemoryStorageImplementation.new();
 }
