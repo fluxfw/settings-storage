@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2022-12-20-2
+
+Changes:
+
+- Check json file exists
+
 ## v2022-12-20-1
 
 Changes:

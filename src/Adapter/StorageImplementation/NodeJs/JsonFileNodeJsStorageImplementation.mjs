@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { StorageImplementation } from "../StorageImplementation.mjs";
 import { readFile, writeFile } from "node:fs/promises";
 
@@ -82,6 +83,13 @@ export class JsonFileNodeJsStorageImplementation extends StorageImplementation {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async init() {
+        await this.#read();
+    }
+
+    /**
      * @param {string} key
      * @param {*} value
      * @returns {Promise<void>}
@@ -98,7 +106,7 @@ export class JsonFileNodeJsStorageImplementation extends StorageImplementation {
      * @returns {Promise<void>}
      */
     async #read() {
-        this.#settings ??= JSON.parse((await readFile(this.#file_path, "utf8")).trim().replaceAll("\r\n", "\n").replaceAll("\r", "\n")) ?? {};
+        this.#settings ??= (existsSync(this.#file_path) ? JSON.parse((await readFile(this.#file_path, "utf8")).trim().replaceAll("\r\n", "\n").replaceAll("\r", "\n")) : null) ?? {};
     }
 
     /**
