@@ -85,6 +85,13 @@ export class StorageBrowserStorageImplementation extends StorageImplementation {
     }
 
     /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        return Object.keys(this.#getAll());
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      */

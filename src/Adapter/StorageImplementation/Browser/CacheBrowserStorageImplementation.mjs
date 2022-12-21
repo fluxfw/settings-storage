@@ -70,9 +70,20 @@ export class CacheBrowserStorageImplementation extends StorageImplementation {
         const cache = await this.#getCache();
 
         return Object.fromEntries(await Promise.all((await cache.keys()).map(async request => [
-            new URL(request.url).searchParams.get(KEY_QUERY_PARAM),
+            this.#getKey(
+                request
+            ),
             await (await cache.match(request)).json()
         ])));
+    }
+
+    /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        return (await (await this.#getCache()).keys()).map(request => this.#getKey(
+            request
+        ));
     }
 
     /**
@@ -80,7 +91,9 @@ export class CacheBrowserStorageImplementation extends StorageImplementation {
      * @returns {Promise<boolean>}
      */
     async has(key) {
-        return (await (await this.#getCache()).keys()).some(request => new URL(request.url).searchParams.get(KEY_QUERY_PARAM) === key);
+        return (await (await this.#getCache()).keys()).some(request => this.#getKey(
+            request
+        ) === key);
     }
 
     /**
@@ -112,6 +125,14 @@ export class CacheBrowserStorageImplementation extends StorageImplementation {
         this.#cache ??= await caches.open(this.#cache_name);
 
         return this.#cache;
+    }
+
+    /**
+     * @param {Request} request
+     * @returns {string | null}
+     */
+    #getKey(request) {
+        return new URL(request.url).searchParams.get(KEY_QUERY_PARAM);
     }
 
     /**

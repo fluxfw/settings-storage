@@ -87,6 +87,21 @@ export class IndexedDBBrowserStorageImplementation extends StorageImplementation
     }
 
     /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        const keys = [];
+
+        for await (const cursor of this.#requestToAsyncGenerator(
+            (await this.#getReadonlyStore()).openKeyCursor()
+        )) {
+            keys.push(cursor.key);
+        }
+
+        return keys;
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      */

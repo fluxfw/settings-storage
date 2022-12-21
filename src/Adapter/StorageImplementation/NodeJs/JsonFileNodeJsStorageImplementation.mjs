@@ -73,6 +73,15 @@ export class JsonFileNodeJsStorageImplementation extends StorageImplementation {
     }
 
     /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        await this.#read();
+
+        return Object.keys(this.#settings);
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      */

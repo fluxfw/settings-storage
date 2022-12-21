@@ -66,6 +66,13 @@ export class MongoDbNodeJsStorageImplementation extends StorageImplementation {
     }
 
     /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        return (await this.#collection.find().toArray()).map(entry => entry.key);
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      */

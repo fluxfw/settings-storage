@@ -66,6 +66,13 @@ export class SettingsApi {
     }
 
     /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        return (await this.#getSettingsService()).getKeys();
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      */

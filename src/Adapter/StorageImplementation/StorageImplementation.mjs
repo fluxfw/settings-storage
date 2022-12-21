@@ -29,6 +29,12 @@ export class StorageImplementation {
     getAll() { }
 
     /**
+     * @returns {Promise<string[]>}
+     * @abstract
+     */
+    getKeys() { }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      * @abstract
