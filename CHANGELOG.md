@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2022-12-21-1
+
+Changes:
+
+- `getKeys`
+
 ## v2022-12-20-3
 
 Changes:

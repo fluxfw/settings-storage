@@ -72,6 +72,15 @@ export class SettingsService {
     }
 
     /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        return (await import("../Command/GetKeysCommand.mjs")).GetKeysCommand.new(
+            this.#storage_implementation
+        ).getKeys();
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      */

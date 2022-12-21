@@ -53,6 +53,13 @@ export class MemoryStorageImplementation extends StorageImplementation {
     }
 
     /**
+     * @returns {Promise<string[]>}
+     */
+    async getKeys() {
+        return Object.keys(this.#settings);
+    }
+
+    /**
      * @param {string} key
      * @returns {Promise<boolean>}
      */
