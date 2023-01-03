@@ -1,5 +1,5 @@
-import { CONTENT_TYPE_JSON } from "../../../../../flux-fetch-api/src/Adapter/ContentType/CONTENT_TYPE.mjs";
-import { HEADER_CONTENT_TYPE } from "../../../../../flux-fetch-api/src/Adapter/Header/HEADER.mjs";
+import { CONTENT_TYPE_JSON } from "../../../../../flux-http-api/src/Adapter/ContentType/CONTENT_TYPE.mjs";
+import { HEADER_CONTENT_TYPE } from "../../../../../flux-http-api/src/Adapter/Header/HEADER.mjs";
 import { StorageImplementation } from "../StorageImplementation.mjs";
 
 const KEY_QUERY_PARAM = "key";
