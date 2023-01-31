@@ -140,8 +140,8 @@ export class CacheBrowserStorageImplementation extends StorageImplementation {
      * @returns {string}
      */
     #getUrl(key) {
-        const search_params = new URLSearchParams();
-        search_params.set(KEY_QUERY_PARAM, key);
-        return `/?${search_params}`;
+        return `/?${new URLSearchParams({
+            [KEY_QUERY_PARAM]: key
+        })}`;
     }
 }
