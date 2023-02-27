@@ -115,13 +115,13 @@ export class JsonFileNodeJsStorageImplementation extends StorageImplementation {
      * @returns {Promise<void>}
      */
     async #read() {
-        this.#settings ??= (existsSync(this.#file_path) ? JSON.parse((await readFile(this.#file_path, "utf8")).trim().replaceAll("\r\n", "\n").replaceAll("\r", "\n")) : null) ?? {};
+        this.#settings ??= (existsSync(this.#file_path) ? JSON.parse(await readFile(this.#file_path, "utf8")) : null) ?? {};
     }
 
     /**
      * @returns {Promise<void>}
      */
     async #write() {
-        await writeFile(this.#file_path, JSON.stringify(this.#settings), "utf8");
+        await writeFile(this.#file_path, JSON.stringify(this.#settings));
     }
 }
