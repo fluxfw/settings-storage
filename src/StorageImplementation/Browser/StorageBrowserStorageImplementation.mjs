@@ -57,18 +57,19 @@ export class StorageBrowserStorageImplementation extends StorageImplementation {
 
     /**
      * @param {string} key
+     * @param {*} default_value
      * @returns {Promise<*>}
      */
-    async get(key) {
+    async get(key, default_value = null) {
         const value = this.#storage.getItem(this.#getKey(
             key
         ));
 
         if (value === null) {
-            return null;
+            return default_value;
         }
 
-        return JSON.parse(value);
+        return JSON.parse(value) ?? default_value;
     }
 
     /**

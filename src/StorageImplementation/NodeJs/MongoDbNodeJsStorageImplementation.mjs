@@ -47,12 +47,13 @@ export class MongoDbNodeJsStorageImplementation extends StorageImplementation {
 
     /**
      * @param {string} key
+     * @param {*} default_value
      * @returns {Promise<*>}
      */
-    async get(key) {
+    async get(key, default_value = null) {
         return (await this.#collection.findOne({
             key
-        }))?.value;
+        }))?.value ?? default_value;
     }
 
     /**

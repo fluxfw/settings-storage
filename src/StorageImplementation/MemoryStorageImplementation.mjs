@@ -39,10 +39,11 @@ export class MemoryStorageImplementation extends StorageImplementation {
 
     /**
      * @param {string} key
+     * @param {*} default_value
      * @returns {Promise<*>}
      */
-    async get(key) {
-        return structuredClone(this.#settings[key]);
+    async get(key, default_value = null) {
+        return structuredClone(this.#settings[key]) ?? default_value;
     }
 
     /**

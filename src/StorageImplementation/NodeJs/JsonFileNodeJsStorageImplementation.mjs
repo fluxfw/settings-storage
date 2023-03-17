@@ -55,12 +55,13 @@ export class JsonFileNodeJsStorageImplementation extends StorageImplementation {
 
     /**
      * @param {string} key
+     * @param {*} default_value
      * @returns {Promise<*>}
      */
-    async get(key) {
+    async get(key, default_value = null) {
         await this.#read();
 
-        return structuredClone(this.#settings[key]);
+        return structuredClone(this.#settings[key]) ?? default_value;
     }
 
     /**

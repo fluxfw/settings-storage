@@ -17,10 +17,11 @@ export class StorageImplementation {
 
     /**
      * @param {string} key
+     * @param {*} default_value
      * @returns {Promise<*>}
      * @abstract
      */
-    get(key) { }
+    get(key, default_value = null) { }
 
     /**
      * @returns {Promise<{[key: string]: *}>}

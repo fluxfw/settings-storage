@@ -1,5 +1,5 @@
-import { CONTENT_TYPE_JSON } from "../../../../../flux-http-api/src/ContentType/CONTENT_TYPE.mjs";
-import { HEADER_CONTENT_TYPE } from "../../../../../flux-http-api/src/Header/HEADER.mjs";
+import { CONTENT_TYPE_JSON } from "../../../../flux-http-api/src/ContentType/CONTENT_TYPE.mjs";
+import { HEADER_CONTENT_TYPE } from "../../../../flux-http-api/src/Header/HEADER.mjs";
 import { StorageImplementation } from "../StorageImplementation.mjs";
 
 const KEY_QUERY_PARAM = "key";
@@ -55,12 +55,13 @@ export class CacheBrowserStorageImplementation extends StorageImplementation {
 
     /**
      * @param {string} key
+     * @param {*} default_value
      * @returns {Promise<*>}
      */
-    async get(key) {
-        return (await (await this.#getCache()).match(this.#getUrl(
+    async get(key, default_value = null) {
+        return await (await (await this.#getCache()).match(this.#getUrl(
             key
-        )))?.json();
+        )))?.json() ?? default_value;
     }
 
     /**

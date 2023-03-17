@@ -61,14 +61,15 @@ export class IndexedDBBrowserStorageImplementation extends StorageImplementation
 
     /**
      * @param {string} key
+     * @param {*} default_value
      * @returns {Promise<*>}
      */
-    async get(key) {
-        return this.#requestToPromise(
+    async get(key, default_value = null) {
+        return await this.#requestToPromise(
             (await this.#getReadonlyStore(
                 true
             )).get(key)
-        );
+        ) ?? default_value;
     }
 
     /**

@@ -1,11 +1,6 @@
-/** @typedef {import("../../Service/Settings/Port/SettingsService.mjs").SettingsService} SettingsService */
-/** @typedef {import("../StorageImplementation/StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("./StorageImplementation/StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
-export class SettingsApi {
-    /**
-     * @type {SettingsService | null}
-     */
-    #settings_service = null;
+export class FluxSettingsApi {
     /**
      * @type {StorageImplementation}
      */
@@ -13,7 +8,7 @@ export class SettingsApi {
 
     /**
      * @param {StorageImplementation} storage_implementation
-     * @returns {SettingsApi}
+     * @returns {FluxSettingsApi}
      */
     static new(storage_implementation) {
         return new this(
@@ -33,7 +28,7 @@ export class SettingsApi {
      * @returns {Promise<void>}
      */
     async clear() {
-        await (await this.#getSettingsService()).clear();
+        await this.#storage_implementation.clear();
     }
 
     /**
@@ -41,7 +36,7 @@ export class SettingsApi {
      * @returns {Promise<void>}
      */
     async delete(key) {
-        await (await this.#getSettingsService()).delete(
+        await this.#storage_implementation.delete(
             key
         );
     }
@@ -52,7 +47,7 @@ export class SettingsApi {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null) {
-        return (await this.#getSettingsService()).get(
+        return this.#storage_implementation.get(
             key,
             default_value
         );
@@ -62,14 +57,14 @@ export class SettingsApi {
      * @returns {Promise<{[key: string]: *}>}
      */
     async getAll() {
-        return (await this.#getSettingsService()).getAll();
+        return this.#storage_implementation.getAll();
     }
 
     /**
      * @returns {Promise<string[]>}
      */
     async getKeys() {
-        return (await this.#getSettingsService()).getKeys();
+        return this.#storage_implementation.getKeys();
     }
 
     /**
@@ -77,7 +72,7 @@ export class SettingsApi {
      * @returns {Promise<boolean>}
      */
     async has(key) {
-        return (await this.#getSettingsService()).has(
+        return this.#storage_implementation.has(
             key
         );
     }
@@ -88,20 +83,9 @@ export class SettingsApi {
      * @returns {Promise<void>}
      */
     async store(key, value) {
-        await (await this.#getSettingsService()).store(
+        await this.#storage_implementation.store(
             key,
             value
         );
-    }
-
-    /**
-     * @returns {Promise<SettingsService>}
-     */
-    async #getSettingsService() {
-        this.#settings_service ??= (await import("../../Service/Settings/Port/SettingsService.mjs")).SettingsService.new(
-            this.#storage_implementation
-        );
-
-        return this.#settings_service;
     }
 }
