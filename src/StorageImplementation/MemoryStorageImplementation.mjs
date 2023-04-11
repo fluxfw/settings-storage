@@ -1,6 +1,9 @@
-import { StorageImplementation } from "./StorageImplementation.mjs";
+/** @typedef {import("./StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
-export class MemoryStorageImplementation extends StorageImplementation {
+/**
+ * @implements {StorageImplementation}
+ */
+export class MemoryStorageImplementation {
     /**
      * @type {{[key: string]: *}}
      */
@@ -17,8 +20,6 @@ export class MemoryStorageImplementation extends StorageImplementation {
      * @private
      */
     constructor() {
-        super();
-
         this.#settings = {};
     }
 

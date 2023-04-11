@@ -1,10 +1,14 @@
 import { CONTENT_TYPE_JSON } from "../../../../flux-http-api/src/ContentType/CONTENT_TYPE.mjs";
 import { HEADER_CONTENT_TYPE } from "../../../../flux-http-api/src/Header/HEADER.mjs";
-import { StorageImplementation } from "../StorageImplementation.mjs";
+
+/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 const KEY_QUERY_PARAM = "key";
 
-export class CacheBrowserStorageImplementation extends StorageImplementation {
+/**
+ * @implements {StorageImplementation}
+ */
+export class CacheBrowserStorageImplementation {
     /**
      * @type {Cache | null}
      */
@@ -29,8 +33,6 @@ export class CacheBrowserStorageImplementation extends StorageImplementation {
      * @private
      */
     constructor(cache_name) {
-        super();
-
         this.#cache_name = cache_name;
     }
 

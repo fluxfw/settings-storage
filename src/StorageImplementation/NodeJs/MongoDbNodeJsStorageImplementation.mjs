@@ -1,8 +1,10 @@
-import { StorageImplementation } from "../StorageImplementation.mjs";
-
 /** @typedef {import("mongodb").Collection} Collection */
+/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
-export class MongoDbNodeJsStorageImplementation extends StorageImplementation {
+/**
+ * @implements {StorageImplementation}
+ */
+export class MongoDbNodeJsStorageImplementation {
     /**
      * @type {Collection}
      */
@@ -23,8 +25,6 @@ export class MongoDbNodeJsStorageImplementation extends StorageImplementation {
      * @private
      */
     constructor(collection) {
-        super();
-
         this.#collection = collection;
     }
 

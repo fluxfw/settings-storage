@@ -1,8 +1,12 @@
 import { existsSync } from "node:fs";
-import { StorageImplementation } from "../StorageImplementation.mjs";
 import { readFile, writeFile } from "node:fs/promises";
 
-export class JsonFileNodeJsStorageImplementation extends StorageImplementation {
+/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+
+/**
+ * @implements {StorageImplementation}
+ */
+export class JsonFileNodeJsStorageImplementation {
     /**
      * @type {string}
      */
@@ -27,8 +31,6 @@ export class JsonFileNodeJsStorageImplementation extends StorageImplementation {
      * @private
      */
     constructor(file_path) {
-        super();
-
         this.#file_path = file_path;
     }
 

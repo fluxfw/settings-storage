@@ -1,8 +1,11 @@
-import { StorageImplementation } from "../StorageImplementation.mjs";
+/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
 
 const DATABASE_VERSION = 1;
 
-export class IndexedDBBrowserStorageImplementation extends StorageImplementation {
+/**
+ * @implements {StorageImplementation}
+ */
+export class IndexedDBBrowserStorageImplementation {
     /**
      * @type {IDBDatabase | null}
      */
@@ -34,8 +37,6 @@ export class IndexedDBBrowserStorageImplementation extends StorageImplementation
      * @private
      */
     constructor(database_name, store_name) {
-        super();
-
         this.#database_name = database_name;
         this.#store_name = store_name;
     }
