@@ -60,17 +60,17 @@ export class MongoDbNodeJsStorageImplementation {
      * @returns {Promise<{[key: string]: *}>}
      */
     async getAll() {
-        return Object.fromEntries((await this.#collection.find().toArray()).map(entry => [
+        return Object.fromEntries(await this.#collection.find().map(entry => [
             entry.key,
             entry.value
-        ]));
+        ]).toArray());
     }
 
     /**
      * @returns {Promise<string[]>}
      */
     async getKeys() {
-        return (await this.#collection.find().toArray()).map(entry => entry.key);
+        return this.#collection.find().map(entry => entry.key).toArray();
     }
 
     /**
