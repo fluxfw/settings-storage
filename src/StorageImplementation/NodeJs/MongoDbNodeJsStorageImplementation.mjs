@@ -89,12 +89,10 @@ export class MongoDbNodeJsStorageImplementation {
      * @returns {Promise<void>}
      */
     async store(key, value) {
-        await this.#collection.updateOne({
+        await this.#collection.replaceOne({
             key
         }, {
-            $set: {
-                value
-            }
+            value
         }, {
             upsert: true
         });
