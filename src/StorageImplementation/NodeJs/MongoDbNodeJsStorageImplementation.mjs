@@ -92,6 +92,7 @@ export class MongoDbNodeJsStorageImplementation {
         await this.#collection.replaceOne({
             key
         }, {
+            key,
             value
         }, {
             upsert: true
