@@ -1,10 +1,10 @@
 /** @typedef {import("mongodb").Collection} Collection */
-/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("../FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 /**
- * @implements {StorageImplementation}
+ * @implements {FluxSettingsStorage}
  */
-export class MongoDbNodeJsStorageImplementation {
+export class FluxMongoDbNodeJsSettingsStorage {
     /**
      * @type {Collection}
      */
@@ -12,7 +12,7 @@ export class MongoDbNodeJsStorageImplementation {
 
     /**
      * @param {Collection} collection
-     * @returns {MongoDbNodeJsStorageImplementation}
+     * @returns {FluxMongoDbNodeJsSettingsStorage}
      */
     static new(collection) {
         return new this(

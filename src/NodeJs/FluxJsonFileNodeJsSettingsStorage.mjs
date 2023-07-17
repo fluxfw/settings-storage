@@ -1,12 +1,12 @@
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 
-/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("../FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 /**
- * @implements {StorageImplementation}
+ * @implements {FluxSettingsStorage}
  */
-export class JsonFileNodeJsStorageImplementation {
+export class FluxJsonFileNodeJsSettingsStorage {
     /**
      * @type {string}
      */
@@ -18,7 +18,7 @@ export class JsonFileNodeJsStorageImplementation {
 
     /**
      * @param {string} file_path
-     * @returns {JsonFileNodeJsStorageImplementation}
+     * @returns {FluxJsonFileNodeJsSettingsStorage}
      */
     static new(file_path) {
         return new this(
@@ -63,7 +63,7 @@ export class JsonFileNodeJsStorageImplementation {
     async get(key, default_value = null) {
         await this.#read();
 
-        return structuredClone(this.#settings[key]) ?? default_value;
+        return structuredClone(this.#settings[key] ?? default_value);
     }
 
     /**

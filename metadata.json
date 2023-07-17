@@ -1,14 +1,14 @@
 {
-    "version": "2023-04-11-1",
-    "description": "Read and store settings from storage implementations",
+    "version": "2023-07-17-1",
+    "description": "Read and store settings storage",
     "topics": [
-        "implementation",
-        "implementations",
+        "delete",
+        "get",
         "read",
         "settings",
         "storage",
-        "storages",
-        "store"
+        "store",
+        "write"
     ],
     "homepage": ""
 }

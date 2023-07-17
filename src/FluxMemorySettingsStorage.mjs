@@ -1,16 +1,16 @@
-/** @typedef {import("./StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 /**
- * @implements {StorageImplementation}
+ * @implements {FluxSettingsStorage}
  */
-export class MemoryStorageImplementation {
+export class FluxMemorySettingsStorage {
     /**
      * @type {{[key: string]: *}}
      */
     #settings;
 
     /**
-     * @returns {MemoryStorageImplementation}
+     * @returns {FluxMemorySettingsStorage}
      */
     static new() {
         return new this();
@@ -44,7 +44,7 @@ export class MemoryStorageImplementation {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null) {
-        return structuredClone(this.#settings[key]) ?? default_value;
+        return structuredClone(this.#settings[key] ?? default_value);
     }
 
     /**

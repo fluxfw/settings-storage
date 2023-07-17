@@ -1,9 +1,9 @@
-/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("../FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 /**
- * @implements {StorageImplementation}
+ * @implements {FluxSettingsStorage}
  */
-export class StorageBrowserStorageImplementation {
+export class FluxStorageBrowserSettingsStorage {
     /**
      * @type {string}
      */
@@ -16,7 +16,7 @@ export class StorageBrowserStorageImplementation {
     /**
      * @param {string} key_prefix
      * @param {Storage} storage
-     * @returns {StorageBrowserStorageImplementation}
+     * @returns {FluxStorageBrowserSettingsStorage}
      */
     static new(key_prefix, storage) {
         return new this(

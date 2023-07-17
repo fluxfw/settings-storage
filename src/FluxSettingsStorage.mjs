@@ -1,7 +1,7 @@
 /**
  * @interface
  */
-export class StorageImplementation {
+export class FluxSettingsStorage {
     /**
      * @returns {Promise<void>}
      * @abstract
@@ -21,7 +21,7 @@ export class StorageImplementation {
      * @returns {Promise<*>}
      * @abstract
      */
-    get(key, default_value = null) { }
+    get(key, default_value) { }
 
     /**
      * @returns {Promise<{[key: string]: *}>}

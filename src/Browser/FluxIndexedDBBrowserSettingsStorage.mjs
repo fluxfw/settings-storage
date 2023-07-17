@@ -1,11 +1,11 @@
-/** @typedef {import("../StorageImplementation.mjs").StorageImplementation} StorageImplementation */
+/** @typedef {import("../FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 const DATABASE_VERSION = 1;
 
 /**
- * @implements {StorageImplementation}
+ * @implements {FluxSettingsStorage}
  */
-export class IndexedDBBrowserStorageImplementation {
+export class FluxIndexedDBBrowserSettingsStorage {
     /**
      * @type {IDBDatabase | null}
      */
@@ -22,7 +22,7 @@ export class IndexedDBBrowserStorageImplementation {
     /**
      * @param {string} database_name
      * @param {string} store_name
-     * @returns {IndexedDBBrowserStorageImplementation}
+     * @returns {FluxIndexedDBBrowserSettingsStorage}
      */
     static new(database_name, store_name) {
         return new this(

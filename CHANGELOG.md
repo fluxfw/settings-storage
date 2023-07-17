@@ -6,6 +6,13 @@ Changes:
 
 \-
 
+## v2023-07-17-1
+
+Changes:
+
+- Simplify
+- Renamed to `flux-setting-storage`
+
 ## v2023-04-11-1
 
 Changes:

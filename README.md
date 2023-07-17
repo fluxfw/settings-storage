@@ -1,3 +1,3 @@
-# flux-settings-api
+# flux-settings-storage
 
-Read and store settings from storage implementations
+Read and store settings storage
