@@ -7,17 +7,17 @@
  * @param {string | null} storage_key_prefix
  * @returns {Promise<FluxSettingsStorage>}
  */
-export async function getFluxBrowserSettingsStorage(indexeddb_database_name = null, indexeddb_store_name = null, cache_cache_name = null, storage_key_prefix = null) {
+export async function getBrowserFluxSettingsStorage(indexeddb_database_name = null, indexeddb_store_name = null, cache_cache_name = null, storage_key_prefix = null) {
     try {
         if (indexeddb_database_name !== null && indexeddb_store_name !== null && (globalThis.indexedDB?.open ?? null) !== null) {
-            const storage_implementation = (await import("./FluxIndexedDBBrowserSettingsStorage.mjs")).FluxIndexedDBBrowserSettingsStorage.new(
+            const flux_settings_storage = (await import("./FluxIndexedDBBrowserSettingsStorage.mjs")).FluxIndexedDBBrowserSettingsStorage.new(
                 indexeddb_database_name,
                 indexeddb_store_name
             );
 
-            await storage_implementation.init();
+            await flux_settings_storage.init();
 
-            return storage_implementation;
+            return flux_settings_storage;
         }
     } catch (error) {
         console.error("Try using FluxIndexedDBBrowserSettingsStorage failed (", error, ")");
@@ -25,13 +25,13 @@ export async function getFluxBrowserSettingsStorage(indexeddb_database_name = nu
 
     try {
         if (cache_cache_name !== null && (globalThis.caches?.open ?? null) !== null) {
-            const storage_implementation = (await import("./FluxCacheBrowserSettingsStorage.mjs")).FluxCacheBrowserSettingsStorage.new(
+            const flux_settings_storage = (await import("./FluxCacheBrowserSettingsStorage.mjs")).FluxCacheBrowserSettingsStorage.new(
                 cache_cache_name
             );
 
-            await storage_implementation.init();
+            await flux_settings_storage.init();
 
-            return storage_implementation;
+            return flux_settings_storage;
         }
     } catch (error) {
         console.error("Try using FluxCacheBrowserSettingsStorage failed (", error, ")");

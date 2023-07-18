@@ -6,7 +6,7 @@
  * @param {string | null} json_file_path
  * @returns {Promise<FluxSettingsStorage>}
  */
-export async function getFluxNodeJsSettingsStorage(mongo_db_collection = null, json_file_path = null) {
+export async function getNodeJsFluxSettingsStorage(mongo_db_collection = null, json_file_path = null) {
     try {
         if (mongo_db_collection !== null) {
             return (await import("./FluxMongoDbNodeJsSettingsStorage.mjs")).FluxMongoDbNodeJsSettingsStorage.new(
@@ -19,13 +19,13 @@ export async function getFluxNodeJsSettingsStorage(mongo_db_collection = null, j
 
     try {
         if (json_file_path !== null) {
-            const storage_implementation = (await import("./FluxJsonFileNodeJsSettingsStorage.mjs")).FluxJsonFileNodeJsSettingsStorage.new(
+            const flux_settings_storage = (await import("./FluxJsonFileNodeJsSettingsStorage.mjs")).FluxJsonFileNodeJsSettingsStorage.new(
                 json_file_path
             );
 
-            await storage_implementation.init();
+            await flux_settings_storage.init();
 
-            return storage_implementation;
+            return flux_settings_storage;
         }
     } catch (error) {
         console.error("Try using FluxJsonFileNodeJsSettingsStorage failed (", error, ")");

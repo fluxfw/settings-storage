@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-07-18-1
+
+Changes:
+
+- `getFluxSettingsStorage`
+
 ## v2023-07-17-1
 
 Changes:
