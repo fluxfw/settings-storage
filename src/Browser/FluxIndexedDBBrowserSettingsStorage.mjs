@@ -46,7 +46,9 @@ export class FluxIndexedDBBrowserSettingsStorage {
      */
     async clear() {
         await this.#requestToPromise(
-            (await this.#getWritableStore()).clear()
+            (await this.#getStore(
+                true
+            )).clear()
         );
     }
 
@@ -56,7 +58,9 @@ export class FluxIndexedDBBrowserSettingsStorage {
      */
     async delete(key) {
         await this.#requestToPromise(
-            (await this.#getWritableStore()).delete(key)
+            (await this.#getStore(
+                true
+            )).delete(key)
         );
     }
 
@@ -67,9 +71,7 @@ export class FluxIndexedDBBrowserSettingsStorage {
      */
     async get(key, default_value = null) {
         return await this.#requestToPromise(
-            (await this.#getReadonlyStore(
-                true
-            )).get(key)
+            (await this.#getStore()).get(key)
         ) ?? default_value;
     }
 
@@ -80,7 +82,7 @@ export class FluxIndexedDBBrowserSettingsStorage {
         const values = {};
 
         for await (const cursor of this.#requestToAsyncGenerator(
-            (await this.#getReadonlyStore()).openCursor()
+            (await this.#getStore()).openCursor()
         )) {
             values[cursor.key] = cursor.value;
         }
@@ -95,7 +97,7 @@ export class FluxIndexedDBBrowserSettingsStorage {
         const keys = [];
 
         for await (const cursor of this.#requestToAsyncGenerator(
-            (await this.#getReadonlyStore()).openKeyCursor()
+            (await this.#getStore()).openKeyCursor()
         )) {
             keys.push(cursor.key);
         }
@@ -109,7 +111,7 @@ export class FluxIndexedDBBrowserSettingsStorage {
      */
     async has(key) {
         return await this.#requestToPromise(
-            (await this.#getReadonlyStore()).openCursor(key)
+            (await this.#getStore()).openCursor(key)
         ) !== null;
     }
 
@@ -127,7 +129,9 @@ export class FluxIndexedDBBrowserSettingsStorage {
      */
     async store(key, value) {
         await this.#requestToPromise(
-            (await this.#getWritableStore()).put(value, key)
+            (await this.#getStore(
+                true
+            )).put(value, key)
         );
     }
 
@@ -169,32 +173,19 @@ export class FluxIndexedDBBrowserSettingsStorage {
     }
 
     /**
+     * @param {boolean | null} write
      * @returns {Promise<IDBObjectStore>}
      */
-    async #getReadonlyStore() {
-        return this.#getStore(
-            true
-        );
-    }
-
-    /**
-     * @param {boolean} readonly
-     * @returns {Promise<IDBObjectStore>}
-     */
-    async #getStore(readonly) {
+    async #getStore(write = null) {
         const database = await this.#getDatabase();
 
         const transaction = database.transaction([
             this.#store_name
-        ], readonly ? "readonly" : "readwrite");
+        ], write ?? false ? "readwrite" : "readonly");
 
         transaction.addEventListener("abort", e => {
             console.error(e, transaction.error);
         });
-
-        /*transaction.addEventListener("complete", () => {
-
-        });*/
 
         transaction.addEventListener("error", e => {
             console.error(e, transaction.error);
@@ -204,18 +195,9 @@ export class FluxIndexedDBBrowserSettingsStorage {
     }
 
     /**
-     * @returns {Promise<IDBObjectStore>}
-     */
-    async #getWritableStore() {
-        return this.#getStore(
-            false
-        );
-    }
-
-    /**
-     * @template C
-     * @param {IDBRequest<C & IDBCursor>} request
-     * @returns {AsyncGenerator<Exclude<C, null>>}
+     * @template R
+     * @param {IDBRequest<R>} request
+     * @returns {AsyncGenerator<Exclude<R, null>>}
      */
     async* #requestToAsyncGenerator(request) {
         let resolve_promise, reject_promise;
@@ -235,8 +217,8 @@ export class FluxIndexedDBBrowserSettingsStorage {
                 }
 
                 resolve_promise({
-                    cursor: request.result,
-                    continue() {
+                    result: request.result,
+                    continue: () => {
                         promise = new Promise((resolve2, reject2) => {
                             resolve_promise = resolve2;
                             reject_promise = reject2;
@@ -255,7 +237,7 @@ export class FluxIndexedDBBrowserSettingsStorage {
                 break;
             }
 
-            yield result.cursor;
+            yield result.result;
 
             promise = null;
             result.continue();
@@ -263,9 +245,9 @@ export class FluxIndexedDBBrowserSettingsStorage {
     }
 
     /**
-     * @template D
-     * @param {IDBRequest<D>} request
-     * @returns {Promise<D>}
+     * @template R
+     * @param {IDBRequest<R>} request
+     * @returns {Promise<R>}
      */
     async #requestToPromise(request) {
         return new Promise((resolve, reject) => {
