@@ -6,6 +6,15 @@ Changes:
 
 \-
 
+## v2023-09-15-1
+
+Changes:
+
+- Modules
+- Directly supports in storage if variant is unavailable and `canStore` for check this
+- Remove `getFluxSettingsStorage` and `getKeys`
+- Remove cache api variant
+
 ## v2023-09-11-1
 
 Changes:

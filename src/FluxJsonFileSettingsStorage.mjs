@@ -1,26 +1,41 @@
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
+
 /** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 /**
- * @implements {FluxSettingsStorage}
+ * @implements {FluxJsonFileSettingsStorage}
  */
-export class FluxMemorySettingsStorage {
+export class FluxJsonFileSettingsStorage {
     /**
-     * @type {{[key: string]: {[key: string]: *}}}
+     * @type {string}
+     */
+    #file_path;
+    /**
+     * @type {{[key: string]: *}}
      */
     #settings;
 
     /**
-     * @returns {FluxMemorySettingsStorage}
+     * @param {string} file_path
+     * @returns {Promise<FluxJsonFileSettingsStorage>}
      */
-    static new() {
-        return new this();
+    static async new(file_path) {
+        const flux_json_file_settings_storage = new this(
+            file_path
+        );
+
+        await flux_json_file_settings_storage.#init();
+
+        return flux_json_file_settings_storage;
     }
 
     /**
+     * @param {string} file_path
      * @private
      */
-    constructor() {
-        this.#settings = {};
+    constructor(file_path) {
+        this.#file_path = file_path;
     }
 
     /**
@@ -37,6 +52,8 @@ export class FluxMemorySettingsStorage {
      */
     async delete(key, module = null) {
         delete this.#settings[module ?? ""]?.[key];
+
+        await this.#write();
     }
 
     /**
@@ -45,6 +62,8 @@ export class FluxMemorySettingsStorage {
      */
     async deleteAll(module = null) {
         delete this.#settings[module ?? ""];
+
+        await this.#write();
     }
 
     /**
@@ -52,6 +71,8 @@ export class FluxMemorySettingsStorage {
      */
     async deleteAllModules() {
         this.#settings = {};
+
+        await this.#write();
     }
 
     /**
@@ -122,11 +143,11 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<void>}
      */
     async store(key, value, module = null) {
-        const _module = module ?? "";
-
-        this.#settings[_module] ??= {};
-
-        this.#settings[_module][key] = structuredClone(value);
+        await this.#store(
+            key,
+            value,
+            module
+        );
     }
 
     /**
@@ -134,12 +155,59 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<void>}
      */
     async storeAll(values) {
+        if (values.length === 0) {
+            return;
+        }
+
         for (const value of values) {
-            await this.store(
+            await this.#store(
                 value.key,
                 value.value,
-                value.module ?? null
+                value.module ?? null,
+                false
             );
         }
+
+        await this.#write();
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async #init() {
+        await this.#read();
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async #read() {
+        this.#settings = (existsSync(this.#file_path) ? JSON.parse(await readFile(this.#file_path, "utf8")) : null) ?? {};
+    }
+
+    /**
+     * @param {string} key
+     * @param {*} value
+     * @param {string | null} module
+     * @param {boolean | null} write
+     * @returns {Promise<void>}
+     */
+    async #store(key, value, module = null, write = null) {
+        const _module = module ?? "";
+
+        this.#settings[_module] ??= {};
+
+        this.#settings[_module][key] = structuredClone(value);
+
+        if (write ?? true) {
+            await this.#write();
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async #write() {
+        await writeFile(this.#file_path, JSON.stringify(this.#settings));
     }
 }

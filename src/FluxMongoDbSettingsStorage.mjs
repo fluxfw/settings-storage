@@ -1,26 +1,31 @@
+/** @typedef {import("mongodb").Collection} Collection */
 /** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 /**
  * @implements {FluxSettingsStorage}
  */
-export class FluxMemorySettingsStorage {
+export class FluxMongoDbSettingsStorage {
     /**
-     * @type {{[key: string]: {[key: string]: *}}}
+     * @type {Collection}
      */
-    #settings;
+    #collection;
 
     /**
-     * @returns {FluxMemorySettingsStorage}
+     * @param {Collection} collection
+     * @returns {FluxMongoDbSettingsStorage}
      */
-    static new() {
-        return new this();
+    static new(collection) {
+        return new this(
+            collection
+        );
     }
 
     /**
+     * @param {Collection} collection
      * @private
      */
-    constructor() {
-        this.#settings = {};
+    constructor(collection) {
+        this.#collection = collection;
     }
 
     /**
@@ -36,7 +41,10 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<void>}
      */
     async delete(key, module = null) {
-        delete this.#settings[module ?? ""]?.[key];
+        await this.#collection.deleteMany({
+            module: module ?? "",
+            key
+        });
     }
 
     /**
@@ -44,14 +52,16 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAll(module = null) {
-        delete this.#settings[module ?? ""];
+        await this.#collection.deleteMany({
+            module: module ?? ""
+        });
     }
 
     /**
      * @returns {Promise<void>}
      */
     async deleteAllModules() {
-        this.#settings = {};
+        await this.#collection.deleteMany();
     }
 
     /**
@@ -61,7 +71,10 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        return structuredClone(this.#settings[module ?? ""]?.[key] ?? default_value);
+        return (await this.#collection.findOne({
+            module: module ?? "",
+            key
+        }))?.value ?? default_value;
     }
 
     /**
@@ -69,39 +82,24 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<{module: string, key: string, value: *}[]>}
      */
     async getAll(module = null) {
-        const _module = module ?? "";
-
-        return Object.entries(this.#settings[_module] ?? {}).reduce((settings, [
-            key,
-            value
-        ]) => [
-                ...settings,
-                {
-                    module: _module,
-                    key,
-                    value: structuredClone(value)
-                }
-            ], []);
+        return this.#collection.find({
+            module: module ?? ""
+        }).map(value => ({
+            module: value.module,
+            key: value.key,
+            value: value.value
+        })).toArray();
     }
 
     /**
      * @returns {Promise<{module: string, key: string, value: *}[]>}
      */
     async getAllModules() {
-        return Object.entries(this.#settings).reduce((settings, [
-            module,
-            keys
-        ]) => Object.entries(keys).reduce((_settings, [
-            key,
-            value
-        ]) => [
-                ..._settings,
-                {
-                    module,
-                    key,
-                    value: structuredClone(value)
-                }
-            ], settings), []);
+        return this.#collection.find().map(value => ({
+            module: value.module,
+            key: value.key,
+            value: value.value
+        })).toArray();
     }
 
     /**
@@ -110,9 +108,10 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<boolean>}
      */
     async has(key, module = null) {
-        const _module = module ?? "";
-
-        return Object.hasOwn(this.#settings, _module) && Object.hasOwn(this.#settings[_module], key);
+        return await this.#collection.findOne({
+            module: module ?? "",
+            key
+        }) !== null;
     }
 
     /**
@@ -124,9 +123,16 @@ export class FluxMemorySettingsStorage {
     async store(key, value, module = null) {
         const _module = module ?? "";
 
-        this.#settings[_module] ??= {};
-
-        this.#settings[_module][key] = structuredClone(value);
+        await this.#collection.replaceOne({
+            module: _module,
+            key
+        }, {
+            module: _module,
+            key,
+            value
+        }, {
+            upsert: true
+        });
     }
 
     /**

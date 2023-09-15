@@ -3,50 +3,75 @@
  */
 export class FluxSettingsStorage {
     /**
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      * @abstract
      */
-    clear() { }
+    canStore() { }
 
     /**
      * @param {string} key
+     * @param {string | null} module
      * @returns {Promise<void>}
      * @abstract
      */
-    delete(key) { }
+    delete(key, module) { }
+
+    /**
+     * @param {string | null} module
+     * @returns {Promise<void>}
+     * @abstract
+     */
+    deleteAll(module) { }
+
+    /**
+     * @returns {Promise<void>}
+     * @abstract
+     */
+    deleteAllModules() { }
 
     /**
      * @param {string} key
      * @param {*} default_value
+     * @param {string | null} module
      * @returns {Promise<*>}
      * @abstract
      */
-    get(key, default_value) { }
+    get(key, default_value, module) { }
 
     /**
-     * @returns {Promise<{[key: string]: *}>}
+     * @param {string | null} module
+     * @returns {Promise<{module: string, key: string, value: *}[]>}
      * @abstract
      */
-    getAll() { }
+    getAll(module) { }
 
     /**
-     * @returns {Promise<string[]>}
+     * @returns {Promise<{module: string, key: string, value: *}[]>}
      * @abstract
      */
-    getKeys() { }
+    getAllModules() { }
 
     /**
      * @param {string} key
+     * @param {string | null} module
      * @returns {Promise<boolean>}
      * @abstract
      */
-    has(key) { }
+    has(key, module) { }
 
     /**
      * @param {string} key
      * @param {*} value
+     * @param {string | null} module
      * @returns {Promise<void>}
      * @abstract
      */
-    store(key, value) { }
+    store(key, value, module) { }
+
+    /**
+     * @param {{module?: string | null, key: string, value: *}[]} values
+     * @returns {Promise<void>}
+     * @abstract
+     */
+    storeAll(values) { }
 }
