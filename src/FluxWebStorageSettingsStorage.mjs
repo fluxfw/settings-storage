@@ -1,3 +1,5 @@
+import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
+
 /** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 const KEY_SEPARATOR = "____";
@@ -58,8 +60,8 @@ export class FluxWebStorageSettingsStorage {
         }
 
         this.#storage.removeItem(this.#getKey(
-            key,
-            module
+            module,
+            key
         ));
     }
 
@@ -73,7 +75,7 @@ export class FluxWebStorageSettingsStorage {
         }
 
         for (const value of this.#getAll(
-            module ?? ""
+            module ?? DEFAULT_MODULE
         )) {
             await this.delete(
                 value.key,
@@ -110,8 +112,8 @@ export class FluxWebStorageSettingsStorage {
         }
 
         const value = this.#storage.getItem(this.#getKey(
-            key,
-            module
+            module,
+            key
         ));
 
         if (value === null) {
@@ -131,7 +133,7 @@ export class FluxWebStorageSettingsStorage {
         }
 
         return this.#getAll(
-            module ?? "",
+            module ?? DEFAULT_MODULE,
             true
         );
     }
@@ -161,8 +163,8 @@ export class FluxWebStorageSettingsStorage {
         }
 
         return this.#storage.getItem(this.#getKey(
-            key,
-            module
+            module,
+            key
         )) !== null;
     }
 
@@ -178,8 +180,8 @@ export class FluxWebStorageSettingsStorage {
         }
 
         this.#storage.setItem(this.#getKey(
-            key,
-            module
+            module,
+            key
         ), JSON.stringify(value));
     }
 
@@ -245,14 +247,14 @@ export class FluxWebStorageSettingsStorage {
     }
 
     /**
-     * @param {string} key
      * @param {string | null} module
+     * @param {string} key
      * @returns {string}
      */
-    #getKey(key, module = null) {
+    #getKey(module, key) {
         return [
             this.#key_prefix,
-            module ?? "",
+            module ?? DEFAULT_MODULE,
             key
         ].join(KEY_SEPARATOR);
     }
@@ -276,6 +278,7 @@ export class FluxWebStorageSettingsStorage {
             const key = session ?? false ? "sessionStorage" : "localStorage";
 
             if ((globalThis[key]?.getItem ?? null) === null) {
+                console.info(`${key} is not available`);
                 return;
             }
 

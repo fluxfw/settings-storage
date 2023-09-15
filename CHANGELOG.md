@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-09-15-2
+
+Changes:
+
+- `FluxDefaultModuleSettingsStorage`
+
 ## v2023-09-15-1
 
 Changes:

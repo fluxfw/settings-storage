@@ -1,3 +1,5 @@
+import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
+
 /** @typedef {import("mongodb").Collection} Collection */
 /** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
@@ -42,7 +44,7 @@ export class FluxMongoDbSettingsStorage {
      */
     async delete(key, module = null) {
         await this.#collection.deleteMany({
-            module: module ?? "",
+            module: module ?? DEFAULT_MODULE,
             key
         });
     }
@@ -53,7 +55,7 @@ export class FluxMongoDbSettingsStorage {
      */
     async deleteAll(module = null) {
         await this.#collection.deleteMany({
-            module: module ?? ""
+            module: module ?? DEFAULT_MODULE
         });
     }
 
@@ -72,7 +74,7 @@ export class FluxMongoDbSettingsStorage {
      */
     async get(key, default_value = null, module = null) {
         return (await this.#collection.findOne({
-            module: module ?? "",
+            module: module ?? DEFAULT_MODULE,
             key
         }))?.value ?? default_value;
     }
@@ -83,7 +85,7 @@ export class FluxMongoDbSettingsStorage {
      */
     async getAll(module = null) {
         return this.#collection.find({
-            module: module ?? ""
+            module: module ?? DEFAULT_MODULE
         }).map(value => ({
             module: value.module,
             key: value.key,
@@ -109,7 +111,7 @@ export class FluxMongoDbSettingsStorage {
      */
     async has(key, module = null) {
         return await this.#collection.findOne({
-            module: module ?? "",
+            module: module ?? DEFAULT_MODULE,
             key
         }) !== null;
     }
@@ -121,7 +123,7 @@ export class FluxMongoDbSettingsStorage {
      * @returns {Promise<void>}
      */
     async store(key, value, module = null) {
-        const _module = module ?? "";
+        const _module = module ?? DEFAULT_MODULE;
 
         await this.#collection.replaceOne({
             module: _module,

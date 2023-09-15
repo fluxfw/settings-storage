@@ -1,3 +1,5 @@
+import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
+
 /** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 const DATABASE_VERSION = 2;
@@ -66,7 +68,7 @@ export class FluxIndexedDBSettingsStorage {
             (await this.#getSettingsStore(
                 true
             )).delete([
-                module ?? "",
+                module ?? DEFAULT_MODULE,
                 key
             ])
         );
@@ -86,7 +88,7 @@ export class FluxIndexedDBSettingsStorage {
         );
 
         for (const key of await this.#requestToPromise(
-            store.index(INDEX_NAME_MODULE).getAllKeys(module ?? "")
+            store.index(INDEX_NAME_MODULE).getAllKeys(module ?? DEFAULT_MODULE)
         )) {
             await this.#requestToPromise(
                 store.delete(key)
@@ -122,7 +124,7 @@ export class FluxIndexedDBSettingsStorage {
 
         return (await this.#requestToPromise(
             (await this.#getSettingsStore()).get([
-                module ?? "",
+                module ?? DEFAULT_MODULE,
                 key
             ])
         ))?.value ?? default_value;
@@ -138,7 +140,7 @@ export class FluxIndexedDBSettingsStorage {
         }
 
         return this.#requestToPromise(
-            (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAll(module ?? "")
+            (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAll(module ?? DEFAULT_MODULE)
         );
     }
 
@@ -167,7 +169,7 @@ export class FluxIndexedDBSettingsStorage {
 
         return await this.#requestToPromise(
             (await this.#getSettingsStore()).openCursor([
-                module ?? "",
+                module ?? DEFAULT_MODULE,
                 key
             ])
         ) !== null;
@@ -188,7 +190,7 @@ export class FluxIndexedDBSettingsStorage {
             (await this.#getSettingsStore(
                 true
             )).put({
-                module: module ?? "",
+                module: module ?? DEFAULT_MODULE,
                 key,
                 value
             })
@@ -292,6 +294,7 @@ export class FluxIndexedDBSettingsStorage {
     async #initDatabase() {
         try {
             if ((globalThis.indexedDB?.open ?? null) === null) {
+                console.info("indexedDB is not available");
                 return;
             }
 

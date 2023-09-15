@@ -1,3 +1,4 @@
+import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 
@@ -51,7 +52,7 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<void>}
      */
     async delete(key, module = null) {
-        delete this.#settings[module ?? ""]?.[key];
+        delete this.#settings[module ?? DEFAULT_MODULE]?.[key];
 
         await this.#write();
     }
@@ -61,7 +62,7 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAll(module = null) {
-        delete this.#settings[module ?? ""];
+        delete this.#settings[module ?? DEFAULT_MODULE];
 
         await this.#write();
     }
@@ -82,7 +83,7 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        return structuredClone(this.#settings[module ?? ""]?.[key] ?? default_value);
+        return structuredClone(this.#settings[module ?? DEFAULT_MODULE]?.[key] ?? default_value);
     }
 
     /**
@@ -90,7 +91,7 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<{module: string, key: string, value: *}[]>}
      */
     async getAll(module = null) {
-        const _module = module ?? "";
+        const _module = module ?? DEFAULT_MODULE;
 
         return Object.entries(this.#settings[_module] ?? {}).reduce((settings, [
             key,
@@ -131,7 +132,7 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<boolean>}
      */
     async has(key, module = null) {
-        const _module = module ?? "";
+        const _module = module ?? DEFAULT_MODULE;
 
         return Object.hasOwn(this.#settings, _module) && Object.hasOwn(this.#settings[_module], key);
     }
@@ -193,7 +194,7 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<void>}
      */
     async #store(key, value, module = null, write = null) {
-        const _module = module ?? "";
+        const _module = module ?? DEFAULT_MODULE;
 
         this.#settings[_module] ??= {};
 

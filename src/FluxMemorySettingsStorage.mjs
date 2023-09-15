@@ -1,3 +1,5 @@
+import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
+
 /** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
 
 /**
@@ -36,7 +38,7 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<void>}
      */
     async delete(key, module = null) {
-        delete this.#settings[module ?? ""]?.[key];
+        delete this.#settings[module ?? DEFAULT_MODULE]?.[key];
     }
 
     /**
@@ -44,7 +46,7 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAll(module = null) {
-        delete this.#settings[module ?? ""];
+        delete this.#settings[module ?? DEFAULT_MODULE];
     }
 
     /**
@@ -61,7 +63,7 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        return structuredClone(this.#settings[module ?? ""]?.[key] ?? default_value);
+        return structuredClone(this.#settings[module ?? DEFAULT_MODULE]?.[key] ?? default_value);
     }
 
     /**
@@ -69,7 +71,7 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<{module: string, key: string, value: *}[]>}
      */
     async getAll(module = null) {
-        const _module = module ?? "";
+        const _module = module ?? DEFAULT_MODULE;
 
         return Object.entries(this.#settings[_module] ?? {}).reduce((settings, [
             key,
@@ -110,7 +112,7 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<boolean>}
      */
     async has(key, module = null) {
-        const _module = module ?? "";
+        const _module = module ?? DEFAULT_MODULE;
 
         return Object.hasOwn(this.#settings, _module) && Object.hasOwn(this.#settings[_module], key);
     }
@@ -122,7 +124,7 @@ export class FluxMemorySettingsStorage {
      * @returns {Promise<void>}
      */
     async store(key, value, module = null) {
-        const _module = module ?? "";
+        const _module = module ?? DEFAULT_MODULE;
 
         this.#settings[_module] ??= {};
 
