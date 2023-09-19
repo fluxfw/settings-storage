@@ -185,6 +185,13 @@ export class FluxReadWriteSettingsStorage {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async #read() {
+        this.#settings = structuredClone(await this.#_read());
+    }
+
+    /**
      * @param {string} key
      * @param {*} value
      * @param {string | null} module
@@ -201,13 +208,6 @@ export class FluxReadWriteSettingsStorage {
         if (write ?? true) {
             await this.#write();
         }
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async #read() {
-        this.#settings = structuredClone(await this.#_read());
     }
 
     /**
