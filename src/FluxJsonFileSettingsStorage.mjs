@@ -1,49 +1,40 @@
-import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
-import { existsSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+/** @typedef {import("./FluxFileSettingsStorage.mjs").FluxFileSettingsStorage} FluxFileSettingsStorage */
+/** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
+/** @typedef {import("./Value.mjs").Value} Value */
 
-/** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
-
-/**
- * @implements {FluxJsonFileSettingsStorage}
- */
 export class FluxJsonFileSettingsStorage {
     /**
-     * @type {string}
+     * @type {FluxFileSettingsStorage}
      */
-    #file_path;
-    /**
-     * @type {{[key: string]: *}}
-     */
-    #settings;
+    #flux_file_settings_storage;
 
     /**
      * @param {string} file_path
      * @returns {Promise<FluxJsonFileSettingsStorage>}
      */
     static async new(file_path) {
-        const flux_json_file_settings_storage = new this(
-            file_path
+        return new this(
+            (await import("./FluxFileSettingsStorage.mjs")).FluxFileSettingsStorage.new(
+                file_path,
+                async string => JSON.parse(string),
+                async settings => JSON.stringify(settings)
+            )
         );
-
-        await flux_json_file_settings_storage.#init();
-
-        return flux_json_file_settings_storage;
     }
 
     /**
-     * @param {string} file_path
+     * @param {FluxFileSettingsStorage} flux_file_settings_storage
      * @private
      */
-    constructor(file_path) {
-        this.#file_path = file_path;
+    constructor(flux_file_settings_storage) {
+        this.#flux_file_settings_storage = flux_file_settings_storage;
     }
 
     /**
      * @returns {Promise<boolean>}
      */
     async canStore() {
-        return true;
+        return this.#flux_file_settings_storage.canStore();
     }
 
     /**
@@ -52,9 +43,10 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<void>}
      */
     async delete(key, module = null) {
-        delete this.#settings[module ?? DEFAULT_MODULE]?.[key];
-
-        await this.#write();
+        await this.#flux_file_settings_storage.delete(
+            key,
+            module
+        );
     }
 
     /**
@@ -62,18 +54,16 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAll(module = null) {
-        delete this.#settings[module ?? DEFAULT_MODULE];
-
-        await this.#write();
+        await this.#flux_file_settings_storage.deleteAll(
+            module
+        );
     }
 
     /**
      * @returns {Promise<void>}
      */
     async deleteAllModules() {
-        this.#settings = {};
-
-        await this.#write();
+        await this.#flux_file_settings_storage.deleteAllModules();
     }
 
     /**
@@ -83,47 +73,28 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        return structuredClone(this.#settings[module ?? DEFAULT_MODULE]?.[key] ?? default_value);
+        return this.#flux_file_settings_storage.get(
+            key,
+            default_value,
+            module
+        );
     }
 
     /**
      * @param {string | null} module
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAll(module = null) {
-        const _module = module ?? DEFAULT_MODULE;
-
-        return Object.entries(this.#settings[_module] ?? {}).reduce((settings, [
-            key,
-            value
-        ]) => [
-                ...settings,
-                {
-                    module: _module,
-                    key,
-                    value: structuredClone(value)
-                }
-            ], []);
+        return this.#flux_file_settings_storage.getAll(
+            module
+        );
     }
 
     /**
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAllModules() {
-        return Object.entries(this.#settings).reduce((settings, [
-            module,
-            keys
-        ]) => Object.entries(keys).reduce((_settings, [
-            key,
-            value
-        ]) => [
-                ..._settings,
-                {
-                    module,
-                    key,
-                    value: structuredClone(value)
-                }
-            ], settings), []);
+        return this.#flux_file_settings_storage.getAllModules();
     }
 
     /**
@@ -132,9 +103,10 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<boolean>}
      */
     async has(key, module = null) {
-        const _module = module ?? DEFAULT_MODULE;
-
-        return Object.hasOwn(this.#settings, _module) && Object.hasOwn(this.#settings[_module], key);
+        return this.#flux_file_settings_storage.has(
+            key,
+            module
+        );
     }
 
     /**
@@ -144,7 +116,7 @@ export class FluxJsonFileSettingsStorage {
      * @returns {Promise<void>}
      */
     async store(key, value, module = null) {
-        await this.#store(
+        await this.#flux_file_settings_storage.store(
             key,
             value,
             module
@@ -152,63 +124,12 @@ export class FluxJsonFileSettingsStorage {
     }
 
     /**
-     * @param {{module?: string | null, key: string, value: *}[]} values
+     * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
     async storeAll(values) {
-        if (values.length === 0) {
-            return;
-        }
-
-        for (const value of values) {
-            await this.#store(
-                value.key,
-                value.value,
-                value.module ?? null,
-                false
-            );
-        }
-
-        await this.#write();
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async #init() {
-        await this.#read();
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async #read() {
-        this.#settings = (existsSync(this.#file_path) ? JSON.parse(await readFile(this.#file_path, "utf8")) : null) ?? {};
-    }
-
-    /**
-     * @param {string} key
-     * @param {*} value
-     * @param {string | null} module
-     * @param {boolean | null} write
-     * @returns {Promise<void>}
-     */
-    async #store(key, value, module = null, write = null) {
-        const _module = module ?? DEFAULT_MODULE;
-
-        this.#settings[_module] ??= {};
-
-        this.#settings[_module][key] = structuredClone(value);
-
-        if (write ?? true) {
-            await this.#write();
-        }
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async #write() {
-        await writeFile(this.#file_path, JSON.stringify(this.#settings));
+        await this.#flux_file_settings_storage.storeAll(
+            values
+        );
     }
 }

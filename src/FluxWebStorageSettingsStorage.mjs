@@ -1,12 +1,10 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
-/** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
+/** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
+/** @typedef {import("./Value.mjs").Value} Value */
 
 const KEY_SEPARATOR = "____";
 
-/**
- * @implements {FluxSettingsStorage}
- */
 export class FluxWebStorageSettingsStorage {
     /**
      * @type {string}
@@ -125,7 +123,7 @@ export class FluxWebStorageSettingsStorage {
 
     /**
      * @param {string | null} module
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAll(module = null) {
         if (!this.#canStore()) {
@@ -139,7 +137,7 @@ export class FluxWebStorageSettingsStorage {
     }
 
     /**
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAllModules() {
         if (!this.#canStore()) {
@@ -186,7 +184,7 @@ export class FluxWebStorageSettingsStorage {
     }
 
     /**
-     * @param {{module?: string | null, key: string, value: *}[]} values
+     * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
     async storeAll(values) {
@@ -213,7 +211,7 @@ export class FluxWebStorageSettingsStorage {
     /**
      * @param {string | null} module
      * @param {boolean | null} parse
-     * @returns {{module: string, key: string, value: *}[]}
+     * @returns {Value[]}
      */
     #getAll(module = null, parse = null) {
         const _parse = parse ?? false;

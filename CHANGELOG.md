@@ -6,6 +6,13 @@ Changes:
 
 \-
 
+## v2023-09-19-1
+
+Changes:
+
+- `FluxReadWriteSettingsStorage` > (`FluxFileSettingsStorage` > (`FluxJsonFileSettingsStorage` || `FluxIniFileSettingsStorage`)) || `FluxMemorySettingsStorage`
+- Switch `FluxSettingsStorage` to JsDoc and rename to `SettingsStorage`
+
 ## v2023-09-15-2
 
 Changes:

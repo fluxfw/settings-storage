@@ -1,16 +1,18 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
-/** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
+/** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
+/** @typedef {import("./Value.mjs").Value} Value */
 
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION_1 = 1;
+
+const DATABASE_VERSION_2 = 2;
+
+const DATABASE_VERSION_CURRENT = DATABASE_VERSION_2;
 
 const INDEX_NAME_MODULE = "module";
 
 const STORE_NAME_SETTINGS = "settings";
 
-/**
- * @implements {FluxSettingsStorage}
- */
 export class FluxIndexedDBSettingsStorage {
     /**
      * @type {IDBDatabase | null}
@@ -30,13 +32,13 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<FluxIndexedDBSettingsStorage>}
      */
     static async new(database_name) {
-        const flux_indexed_db_browser_settings_storage = new this(
+        const flux_indexed_db_settings_storage = new this(
             database_name
         );
 
-        await flux_indexed_db_browser_settings_storage.#init();
+        await flux_indexed_db_settings_storage.#init();
 
-        return flux_indexed_db_browser_settings_storage;
+        return flux_indexed_db_settings_storage;
     }
 
     /**
@@ -132,7 +134,7 @@ export class FluxIndexedDBSettingsStorage {
 
     /**
      * @param {string | null} module
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAll(module = null) {
         if (!this.#canStore()) {
@@ -145,7 +147,7 @@ export class FluxIndexedDBSettingsStorage {
     }
 
     /**
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAllModules() {
         if (!this.#canStore()) {
@@ -198,7 +200,7 @@ export class FluxIndexedDBSettingsStorage {
     }
 
     /**
-     * @param {{module?: string | null, key: string, value: *}[]} values
+     * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
     async storeAll(values) {
@@ -298,7 +300,7 @@ export class FluxIndexedDBSettingsStorage {
                 return;
             }
 
-            const request = indexedDB.open(this.#database_name, DATABASE_VERSION);
+            const request = indexedDB.open(this.#database_name, DATABASE_VERSION_CURRENT);
 
             request.addEventListener("blocked", e => {
                 console.error(e);
@@ -313,7 +315,7 @@ export class FluxIndexedDBSettingsStorage {
                 this.#upgrade_transaction = request.transaction;
 
                 let version_1_values = null;
-                if (e.oldVersion === 1) {
+                if (e.oldVersion === DATABASE_VERSION_1) {
                     version_1_values = await this.#version1GetAll();
 
                     this.#database.deleteObjectStore(STORE_NAME_SETTINGS);

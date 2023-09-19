@@ -1,11 +1,9 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 /** @typedef {import("mongodb").Collection} Collection */
-/** @typedef {import("./FluxSettingsStorage.mjs").FluxSettingsStorage} FluxSettingsStorage */
+/** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
+/** @typedef {import("./Value.mjs").Value} Value */
 
-/**
- * @implements {FluxSettingsStorage}
- */
 export class FluxMongoDbSettingsStorage {
     /**
      * @type {Collection}
@@ -81,7 +79,7 @@ export class FluxMongoDbSettingsStorage {
 
     /**
      * @param {string | null} module
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAll(module = null) {
         return this.#collection.find({
@@ -94,7 +92,7 @@ export class FluxMongoDbSettingsStorage {
     }
 
     /**
-     * @returns {Promise<{module: string, key: string, value: *}[]>}
+     * @returns {Promise<Value[]>}
      */
     async getAllModules() {
         return this.#collection.find().map(value => ({
@@ -138,7 +136,7 @@ export class FluxMongoDbSettingsStorage {
     }
 
     /**
-     * @param {{module?: string | null, key: string, value: *}[]} values
+     * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
     async storeAll(values) {
