@@ -21,12 +21,12 @@ const SECTION_END = "]";
 
 const ESCAPE_CHARS = Object.freeze([
     ESCAPE_CHAR,
-    COMMENT_1,
-    COMMENT_2,
-    FIELD_SEPARATOR,
     LINE_SEPARATOR,
     SECTION_START,
     SECTION_END,
+    FIELD_SEPARATOR,
+    COMMENT_1,
+    COMMENT_2,
     "\"",
     "'",
     ".",
