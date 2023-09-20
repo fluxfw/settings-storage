@@ -191,6 +191,14 @@ export class FluxIniFileSettingsStorage {
     }
 
     /**
+     * @param {string} value
+     * @returns {string}
+     */
+    #escapeRegExp(value) {
+        return value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    /**
      * @param {string} file_path
      * @returns {Promise<void>}
      */
@@ -207,6 +215,16 @@ export class FluxIniFileSettingsStorage {
     }
 
     /**
+     * @param {string} value
+     * @returns {boolean}
+     */
+    #isEndEscaped(value) {
+        return value.match(new RegExp(`${this.#escapeRegExp(
+            ESCAPE_CHAR
+        )}*$`))[0].length % 2 === 1;
+    }
+
+    /**
      * @param {string} string
      * @returns {Promise<Settings>}
      */
@@ -217,12 +235,18 @@ export class FluxIniFileSettingsStorage {
         let current_multiline_key = null;
 
         for (const line of string.replaceAll(`\r${LINE_SEPARATOR}`, LINE_SEPARATOR).replaceAll("\r", LINE_SEPARATOR).split(LINE_SEPARATOR)) {
+            const _line = this.#removeComments(
+                line
+            );
+
             if (current_multiline_key !== null) {
                 const key = current_multiline_key;
 
-                let value = `${settings[current_module][key]}${line}`;
+                let value = `${settings[current_module][key]}${_line}`;
 
-                if (value.endsWith(ESCAPE_CHAR)) {
+                if (this.#isEndEscaped(
+                    _line
+                )) {
                     value += LINE_SEPARATOR;
                 } else {
                     value = this.#unescape(
@@ -236,22 +260,22 @@ export class FluxIniFileSettingsStorage {
                 continue;
             }
 
-            if (line.trim() === "" || line.startsWith(COMMENT_1) || line.startsWith(COMMENT_2)) {
+            if (_line.trim() === "") {
                 continue;
             }
 
-            if (line.startsWith(SECTION_START) && line.endsWith(SECTION_END)) {
+            if (_line.startsWith(SECTION_START) && _line.endsWith(SECTION_END)) {
                 current_module = this.#unescape(
-                    line.slice(SECTION_START.length, -SECTION_END.length)
+                    _line.slice(SECTION_START.length, -SECTION_END.length)
                 ).trim();
                 continue;
             }
 
-            if (line.includes(FIELD_SEPARATOR)) {
+            if (_line.includes(FIELD_SEPARATOR)) {
                 const [
                     key,
                     ...values
-                ] = line.split(FIELD_SEPARATOR);
+                ] = _line.split(FIELD_SEPARATOR);
 
                 const _key = this.#unescape(
                     key
@@ -259,7 +283,9 @@ export class FluxIniFileSettingsStorage {
 
                 let value = values.join(FIELD_SEPARATOR).trimStart();
 
-                if (value.endsWith(ESCAPE_CHAR)) {
+                if (this.#isEndEscaped(
+                    value
+                )) {
                     value += LINE_SEPARATOR;
                     current_multiline_key = _key;
                 } else {
@@ -275,6 +301,51 @@ export class FluxIniFileSettingsStorage {
         }
 
         return settings;
+    }
+
+    /**
+     * @param {string} line
+     * @returns {string}
+     */
+    #removeComments(line) {
+        return this.#removeComment(
+            this.#removeComment(
+                line,
+                COMMENT_1
+            ),
+            COMMENT_2
+        );
+    }
+
+    /**
+     * @param {string} line
+     * @param {string} char
+     * @returns {string}
+     */
+    #removeComment(line, char) {
+        const parts = line.split(char);
+
+        let _line = "";
+
+        for (const [
+            index,
+            part
+        ] of parts.entries()) {
+            _line += part;
+
+            if (index === parts.length - 1 || !this.#isEndEscaped(
+                part
+            )) {
+                if (index > 0) {
+                    _line = _line.trimEnd();
+                }
+                break;
+            }
+
+            _line += char;
+        }
+
+        return _line;
     }
 
     /**
