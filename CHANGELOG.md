@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-09-21-1
+
+Changes:
+
+- Remove `canStore` and get `null` if variant is not available
+
 ## v2023-09-20-2
 
 Changes:

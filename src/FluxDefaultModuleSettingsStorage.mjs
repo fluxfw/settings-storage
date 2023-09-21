@@ -37,13 +37,6 @@ export class FluxDefaultModuleSettingsStorage {
     }
 
     /**
-     * @returns {Promise<boolean>}
-     */
-    async canStore() {
-        return this.#settings_storage.canStore();
-    }
-
-    /**
      * @param {string} key
      * @param {string | null} module
      * @returns {Promise<void>}

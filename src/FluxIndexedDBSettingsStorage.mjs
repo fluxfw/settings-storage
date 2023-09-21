@@ -15,9 +15,9 @@ const STORE_NAME_SETTINGS = "settings";
 
 export class FluxIndexedDBSettingsStorage {
     /**
-     * @type {IDBDatabase | null}
+     * @type {IDBDatabase}
      */
-    #database = null;
+    #database;
     /**
      * @type {string}
      */
@@ -29,14 +29,16 @@ export class FluxIndexedDBSettingsStorage {
 
     /**
      * @param {string} database_name
-     * @returns {Promise<FluxIndexedDBSettingsStorage>}
+     * @returns {Promise<FluxIndexedDBSettingsStorage | null>}
      */
     static async new(database_name) {
         const flux_indexed_db_settings_storage = new this(
             database_name
         );
 
-        await flux_indexed_db_settings_storage.#init();
+        if (!await flux_indexed_db_settings_storage.#init()) {
+            return null;
+        }
 
         return flux_indexed_db_settings_storage;
     }
@@ -50,22 +52,11 @@ export class FluxIndexedDBSettingsStorage {
     }
 
     /**
-     * @returns {Promise<boolean>}
-     */
-    async canStore() {
-        return this.#canStore();
-    }
-
-    /**
      * @param {string} key
      * @param {string | null} module
      * @returns {Promise<void>}
      */
     async delete(key, module = null) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         await this.#requestToPromise(
             (await this.#getSettingsStore(
                 true
@@ -81,10 +72,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAll(module = null) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         const store = await this.#getSettingsStore(
             true
         );
@@ -102,10 +89,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAllModules() {
-        if (!this.#canStore()) {
-            return;
-        }
-
         await this.#requestToPromise(
             (await this.#getSettingsStore(
                 true
@@ -120,10 +103,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        if (!this.#canStore()) {
-            return default_value;
-        }
-
         return (await this.#requestToPromise(
             (await this.#getSettingsStore()).get([
                 module ?? DEFAULT_MODULE,
@@ -137,10 +116,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAll(module = null) {
-        if (!this.#canStore()) {
-            return [];
-        }
-
         return this.#requestToPromise(
             (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAll(module ?? DEFAULT_MODULE)
         );
@@ -150,10 +125,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAllModules() {
-        if (!this.#canStore()) {
-            return [];
-        }
-
         return this.#requestToPromise(
             (await this.#getSettingsStore()).getAll()
         );
@@ -165,10 +136,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<boolean>}
      */
     async has(key, module = null) {
-        if (!this.#canStore()) {
-            return false;
-        }
-
         return await this.#requestToPromise(
             (await this.#getSettingsStore()).openCursor([
                 module ?? DEFAULT_MODULE,
@@ -184,10 +151,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async store(key, value, module = null) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         await this.#requestToPromise(
             (await this.#getSettingsStore(
                 true
@@ -204,10 +167,6 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async storeAll(values) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         for (const value of values) {
             await this.store(
                 value.key,
@@ -215,13 +174,6 @@ export class FluxIndexedDBSettingsStorage {
                 value.module ?? null
             );
         }
-    }
-
-    /**
-     * @returns {boolean}
-     */
-    #canStore() {
-        return this.#database !== null;
     }
 
     /**
@@ -284,20 +236,20 @@ export class FluxIndexedDBSettingsStorage {
     }
 
     /**
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async #init() {
-        await this.#initDatabase();
+        return this.#initDatabase();
     }
 
     /**
-     * @returns {Promise<void>}
+     * @returns {Promise<boolean>}
      */
     async #initDatabase() {
         try {
             if ((globalThis.indexedDB?.open ?? null) === null) {
                 console.info("indexedDB is not available");
-                return;
+                return false;
             }
 
             const request = indexedDB.open(this.#database_name, DATABASE_VERSION_CURRENT);
@@ -355,7 +307,10 @@ export class FluxIndexedDBSettingsStorage {
             });
         } catch (error) {
             console.error("Init database failed (", error, ")");
+            return false;
         }
+
+        return true;
     }
 
     /**

@@ -45,13 +45,6 @@ export class FluxReadWriteSettingsStorage {
     }
 
     /**
-     * @returns {Promise<boolean>}
-     */
-    async canStore() {
-        return true;
-    }
-
-    /**
      * @param {string} key
      * @param {string | null} module
      * @returns {Promise<void>}

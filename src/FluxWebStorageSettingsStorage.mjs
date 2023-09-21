@@ -11,23 +11,25 @@ export class FluxWebStorageSettingsStorage {
      */
     #key_prefix;
     /**
-     * @type {Storage | null}
+     * @type {Storage}
      */
-    #storage = null;
+    #storage;
 
     /**
      * @param {string} key_prefix
      * @param {boolean | null} session
-     * @returns {Promise<FluxWebStorageSettingsStorage>}
+     * @returns {FluxWebStorageSettingsStorage | null}
      */
-    static async new(key_prefix, session = null) {
+    static new(key_prefix, session = null) {
         const flux_web_storage_settings_storage = new this(
             key_prefix
         );
 
-        await flux_web_storage_settings_storage.#init(
+        if (!flux_web_storage_settings_storage.#init(
             session
-        );
+        )) {
+            return null;
+        }
 
         return flux_web_storage_settings_storage;
     }
@@ -41,22 +43,11 @@ export class FluxWebStorageSettingsStorage {
     }
 
     /**
-     * @returns {Promise<boolean>}
-     */
-    async canStore() {
-        return this.#canStore();
-    }
-
-    /**
      * @param {string} key
      * @param {string | null} module
      * @returns {Promise<void>}
      */
     async delete(key, module = null) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         this.#storage.removeItem(this.#getKey(
             module,
             key
@@ -68,10 +59,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAll(module = null) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         for (const value of this.#getAll(
             module ?? DEFAULT_MODULE
         )) {
@@ -86,10 +73,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAllModules() {
-        if (!this.#canStore()) {
-            return;
-        }
-
         for (const value of this.#getAll()) {
             await this.delete(
                 value.key,
@@ -105,10 +88,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        if (!this.#canStore()) {
-            return default_value;
-        }
-
         const value = this.#storage.getItem(this.#getKey(
             module,
             key
@@ -126,10 +105,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAll(module = null) {
-        if (!this.#canStore()) {
-            return [];
-        }
-
         return this.#getAll(
             module ?? DEFAULT_MODULE,
             true
@@ -140,10 +115,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAllModules() {
-        if (!this.#canStore()) {
-            return [];
-        }
-
         return this.#getAll(
             null,
             true
@@ -156,10 +127,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<boolean>}
      */
     async has(key, module = null) {
-        if (!this.#canStore()) {
-            return false;
-        }
-
         return this.#storage.getItem(this.#getKey(
             module,
             key
@@ -173,10 +140,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<void>}
      */
     async store(key, value, module = null) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         this.#storage.setItem(this.#getKey(
             module,
             key
@@ -188,10 +151,6 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<void>}
      */
     async storeAll(values) {
-        if (!this.#canStore()) {
-            return;
-        }
-
         for (const value of values) {
             await this.store(
                 value.key,
@@ -199,13 +158,6 @@ export class FluxWebStorageSettingsStorage {
                 value.module ?? null
             );
         }
-    }
-
-    /**
-     * @returns {boolean}
-     */
-    #canStore() {
-        return this.#storage !== null;
     }
 
     /**
@@ -259,30 +211,33 @@ export class FluxWebStorageSettingsStorage {
 
     /**
      * @param {boolean | null} session
-     * @returns {Promise<void>}
+     * @returns {boolean}
      */
-    async #init(session = null) {
-        await this.#initStorage(
+    #init(session = null) {
+        return this.#initStorage(
             session
         );
     }
 
     /**
      * @param {boolean | null} session
-     * @returns {Promise<void>}
+     * @returns {boolean}
      */
-    async #initStorage(session = null) {
+    #initStorage(session = null) {
         try {
             const key = session ?? false ? "sessionStorage" : "localStorage";
 
             if ((globalThis[key]?.getItem ?? null) === null) {
                 console.info(`${key} is not available`);
-                return;
+                return false;
             }
 
             this.#storage = globalThis[key];
         } catch (error) {
             console.error("Init storage failed (", error, ")");
+            return false;
         }
+
+        return true;
     }
 }

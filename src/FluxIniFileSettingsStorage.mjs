@@ -61,13 +61,6 @@ export class FluxIniFileSettingsStorage {
     }
 
     /**
-     * @returns {Promise<boolean>}
-     */
-    async canStore() {
-        return this.#flux_file_settings_storage.canStore();
-    }
-
-    /**
      * @param {string} key
      * @param {string | null} module
      * @returns {Promise<void>}
