@@ -25,16 +25,16 @@ export class FluxFileSettingsStorage {
      * @returns {Promise<SettingsStorage>}
      */
     static async new(file_path, stringify, parse) {
-        const flux_file_settings_storage = new this(
+        const settings_storage = new this(
             file_path,
             stringify,
             parse
         );
 
         return (await import("./FluxReadWriteSettingsStorage.mjs")).FluxReadWriteSettingsStorage.new(
-            async () => flux_file_settings_storage.#read(),
+            async () => settings_storage.#read(),
             async settings => {
-                await flux_file_settings_storage.#write(
+                await settings_storage.#write(
                     settings
                 );
             }

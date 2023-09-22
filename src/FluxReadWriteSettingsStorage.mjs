@@ -25,14 +25,14 @@ export class FluxReadWriteSettingsStorage {
      * @returns {Promise<SettingsStorage>}
      */
     static async new(read, write) {
-        const flux_read_write_settings_storage = new this(
+        const settings_storage = new this(
             read,
             write
         );
 
-        await flux_read_write_settings_storage.#init();
+        await settings_storage.#init();
 
-        return flux_read_write_settings_storage;
+        return settings_storage;
     }
 
     /**

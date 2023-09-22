@@ -36,15 +36,39 @@ export class FluxIniFileSettingsStorage {
      * @param {string} file_path
      * @returns {Promise<SettingsStorage>}
      */
+    static async newWithDefaultValueType(file_path) {
+        return (await import("./FluxDefaultValueTypeSettingsStorage.mjs")).FluxDefaultValueTypeSettingsStorage.new(
+            await this.new(
+                file_path
+            )
+        );
+    }
+
+    /**
+     * @param {string} file_path
+     * @returns {Promise<SettingsStorage>}
+     */
+    static async newWithJsonStringifyValue(file_path) {
+        return (await import("./FluxJsonStringifyValueSettingsStorage.mjs")).FluxJsonStringifyValueSettingsStorage.new(
+            await this.new(
+                file_path
+            )
+        );
+    }
+
+    /**
+     * @param {string} file_path
+     * @returns {Promise<SettingsStorage>}
+     */
     static async new(file_path) {
-        const flux_ini_file_settings_storage = new this();
+        const settings_storage = new this();
 
         return (await import("./FluxFileSettingsStorage.mjs")).FluxFileSettingsStorage.new(
             file_path,
-            async settings => flux_ini_file_settings_storage.#stringify(
+            async settings => settings_storage.#stringify(
                 settings
             ),
-            async settings => flux_ini_file_settings_storage.#parse(
+            async settings => settings_storage.#parse(
                 settings
             )
         );

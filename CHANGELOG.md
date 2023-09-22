@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-09-22-3
+
+Changes:
+
+- `newWith`
+
 ## v2023-09-22-2
 
 Changes:

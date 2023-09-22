@@ -19,20 +19,64 @@ export class FluxWebStorageSettingsStorage {
     /**
      * @param {string} key_prefix
      * @param {boolean | null} session
+     * @returns {Promise<SettingsStorage | null>}
+     */
+    static async newWithJsonStringifyValue(key_prefix, session = null) {
+        const settings_storage = this.new(
+            key_prefix,
+            session
+        );
+
+        if (settings_storage === null) {
+            return null;
+        }
+
+        return (await import("./FluxJsonStringifyValueSettingsStorage.mjs")).FluxJsonStringifyValueSettingsStorage.new(
+            settings_storage
+        );
+    }
+
+    /**
+     * @param {string} key_prefix
+     * @param {boolean | null} session
+     * @returns {Promise<SettingsStorage>}
+     */
+    static async newWithJsonStringifyValueAndMemoryFallback(key_prefix, session = null) {
+        return await this.newWithJsonStringifyValue(
+            key_prefix,
+            session
+        ) ?? (await import("./FluxMemorySettingsStorage.mjs")).FluxMemorySettingsStorage.new();
+    }
+
+    /**
+     * @param {string} key_prefix
+     * @param {boolean | null} session
+     * @returns {Promise<SettingsStorage>}
+     */
+    static async newWithMemoryFallback(key_prefix, session = null) {
+        return this.new(
+            key_prefix,
+            session
+        ) ?? (await import("./FluxMemorySettingsStorage.mjs")).FluxMemorySettingsStorage.new();
+    }
+
+    /**
+     * @param {string} key_prefix
+     * @param {boolean | null} session
      * @returns {SettingsStorage | null}
      */
     static new(key_prefix, session = null) {
-        const flux_web_storage_settings_storage = new this(
+        const settings_storage = new this(
             key_prefix
         );
 
-        if (!flux_web_storage_settings_storage.#init(
+        if (!settings_storage.#init(
             session
         )) {
             return null;
         }
 
-        return flux_web_storage_settings_storage;
+        return settings_storage;
     }
 
     /**

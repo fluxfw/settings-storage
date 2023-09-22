@@ -30,18 +30,28 @@ export class FluxIndexedDBSettingsStorage {
 
     /**
      * @param {string} database_name
+     * @returns {Promise<SettingsStorage>}
+     */
+    static async newWithMemoryFallback(database_name) {
+        return await this.new(
+            database_name
+        ) ?? (await import("./FluxMemorySettingsStorage.mjs")).FluxMemorySettingsStorage.new();
+    }
+
+    /**
+     * @param {string} database_name
      * @returns {Promise<SettingsStorage | null>}
      */
     static async new(database_name) {
-        const flux_indexed_db_settings_storage = new this(
+        const settings_storage = new this(
             database_name
         );
 
-        if (!await flux_indexed_db_settings_storage.#init()) {
+        if (!await settings_storage.#init()) {
             return null;
         }
 
-        return flux_indexed_db_settings_storage;
+        return settings_storage;
     }
 
     /**
