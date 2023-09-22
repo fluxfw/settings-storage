@@ -1,5 +1,6 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
+/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
@@ -29,7 +30,7 @@ export class FluxIndexedDBSettingsStorage {
 
     /**
      * @param {string} database_name
-     * @returns {Promise<FluxIndexedDBSettingsStorage | null>}
+     * @returns {Promise<SettingsStorage | null>}
      */
     static async new(database_name) {
         const flux_indexed_db_settings_storage = new this(
@@ -68,10 +69,21 @@ export class FluxIndexedDBSettingsStorage {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async deleteAll() {
+        await this.#requestToPromise(
+            (await this.#getSettingsStore(
+                true
+            )).clear()
+        );
+    }
+
+    /**
      * @param {string | null} module
      * @returns {Promise<void>}
      */
-    async deleteAll(module = null) {
+    async deleteAllByModule(module = null) {
         const store = await this.#getSettingsStore(
             true
         );
@@ -83,17 +95,6 @@ export class FluxIndexedDBSettingsStorage {
                 store.delete(key)
             );
         }
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async deleteAllModules() {
-        await this.#requestToPromise(
-            (await this.#getSettingsStore(
-                true
-            )).clear()
-        );
     }
 
     /**
@@ -112,21 +113,21 @@ export class FluxIndexedDBSettingsStorage {
     }
 
     /**
-     * @param {string | null} module
      * @returns {Promise<Value[]>}
      */
-    async getAll(module = null) {
+    async getAll() {
         return this.#requestToPromise(
-            (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAll(module ?? DEFAULT_MODULE)
+            (await this.#getSettingsStore()).getAllByModule()
         );
     }
 
     /**
+     * @param {string | null} module
      * @returns {Promise<Value[]>}
      */
-    async getAllModules() {
+    async getAllByModule(module = null) {
         return this.#requestToPromise(
-            (await this.#getSettingsStore()).getAll()
+            (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAllByModule(module ?? DEFAULT_MODULE)
         );
     }
 
@@ -166,7 +167,7 @@ export class FluxIndexedDBSettingsStorage {
      * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
-    async storeAll(values) {
+    async storeMultiple(values) {
         for (const value of values) {
             await this.store(
                 value.key,
@@ -276,7 +277,7 @@ export class FluxIndexedDBSettingsStorage {
                 await this.#createStores();
 
                 if (version_1_values !== null) {
-                    await this.storeAll(
+                    await this.storeMultiple(
                         Object.entries(version_1_values).map(([
                             key,
                             value

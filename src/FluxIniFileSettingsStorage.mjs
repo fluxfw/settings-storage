@@ -1,9 +1,7 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
-/** @typedef {import("./FluxFileSettingsStorage.mjs").FluxFileSettingsStorage} FluxFileSettingsStorage */
 /** @typedef {import("./Settings.mjs").Settings} Settings */
-/** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
-/** @typedef {import("./Value.mjs").Value} Value */
+/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 
 const COMMENT_1 = ";";
 
@@ -35,22 +33,21 @@ const ESCAPE_CHARS = Object.freeze([
 
 export class FluxIniFileSettingsStorage {
     /**
-     * @type {FluxFileSettingsStorage}
-     */
-    #flux_file_settings_storage;
-
-    /**
      * @param {string} file_path
-     * @returns {Promise<FluxIniFileSettingsStorage>}
+     * @returns {Promise<SettingsStorage>}
      */
     static async new(file_path) {
         const flux_ini_file_settings_storage = new this();
 
-        await flux_ini_file_settings_storage.#init(
-            file_path
+        return (await import("./FluxFileSettingsStorage.mjs")).FluxFileSettingsStorage.new(
+            file_path,
+            async settings => flux_ini_file_settings_storage.#stringify(
+                settings
+            ),
+            async settings => flux_ini_file_settings_storage.#parse(
+                settings
+            )
         );
-
-        return flux_ini_file_settings_storage;
     }
 
     /**
@@ -61,126 +58,11 @@ export class FluxIniFileSettingsStorage {
     }
 
     /**
-     * @param {string} key
-     * @param {string | null} module
-     * @returns {Promise<void>}
-     */
-    async delete(key, module = null) {
-        await this.#flux_file_settings_storage.delete(
-            key,
-            module
-        );
-    }
-
-    /**
-     * @param {string | null} module
-     * @returns {Promise<void>}
-     */
-    async deleteAll(module = null) {
-        await this.#flux_file_settings_storage.deleteAll(
-            module
-        );
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async deleteAllModules() {
-        await this.#flux_file_settings_storage.deleteAllModules();
-    }
-
-    /**
-     * @param {string} key
-     * @param {*} default_value
-     * @param {string | null} module
-     * @returns {Promise<*>}
-     */
-    async get(key, default_value = null, module = null) {
-        let value = await this.#flux_file_settings_storage.get(
-            key,
-            default_value,
-            module
-        );
-
-        if (typeof default_value === "number" && typeof value === "string" && /^-?\d+(\.\d+)?$/.test(value) && !isNaN(value)) {
-            const _value = parseFloat(value);
-            if (!Number.isNaN(_value)) {
-                value = _value;
-            }
-        }
-
-        if (typeof default_value === "boolean") {
-            if (value === "true" || value === 1 || value === "1") {
-                value = true;
-            } else {
-                if (value === "false" || value === 0 || value === "0") {
-                    value = false;
-                }
-            }
-        }
-
-        return value;
-    }
-
-    /**
-     * @param {string | null} module
-     * @returns {Promise<Value[]>}
-     */
-    async getAll(module = null) {
-        return this.#flux_file_settings_storage.getAll(
-            module
-        );
-    }
-
-    /**
-     * @returns {Promise<Value[]>}
-     */
-    async getAllModules() {
-        return this.#flux_file_settings_storage.getAllModules();
-    }
-
-    /**
-     * @param {string} key
-     * @param {string | null} module
-     * @returns {Promise<boolean>}
-     */
-    async has(key, module = null) {
-        return this.#flux_file_settings_storage.has(
-            key,
-            module
-        );
-    }
-
-    /**
-     * @param {string} key
-     * @param {*} value
-     * @param {string | null} module
-     * @returns {Promise<void>}
-     */
-    async store(key, value, module = null) {
-        await this.#flux_file_settings_storage.store(
-            key,
-            value,
-            module
-        );
-    }
-
-    /**
-     * @param {StoreValue[]} values
-     * @returns {Promise<void>}
-     */
-    async storeAll(values) {
-        await this.#flux_file_settings_storage.storeAll(
-            values
-        );
-    }
-
-    /**
-     * @param {*} value
+     * @param {string} value
      * @returns {string}
      */
     #escape(value) {
-        return ESCAPE_CHARS.reduce((_value, char) => _value.replaceAll(char, `${ESCAPE_CHAR}${char}`), `${value}`);
+        return ESCAPE_CHARS.reduce((_value, char) => _value.replaceAll(char, `${ESCAPE_CHAR}${char}`), value);
     }
 
     /**
@@ -189,22 +71,6 @@ export class FluxIniFileSettingsStorage {
      */
     #escapeRegExp(value) {
         return value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
-    /**
-     * @param {string} file_path
-     * @returns {Promise<void>}
-     */
-    async #init(file_path) {
-        this.#flux_file_settings_storage = await (await import("./FluxFileSettingsStorage.mjs")).FluxFileSettingsStorage.new(
-            file_path,
-            async string => this.#parse(
-                string
-            ),
-            async settings => this.#stringify(
-                settings
-            )
-        );
     }
 
     /**
@@ -218,16 +84,16 @@ export class FluxIniFileSettingsStorage {
     }
 
     /**
-     * @param {string} string
+     * @param {string} settings
      * @returns {Promise<Settings>}
      */
-    async #parse(string) {
-        const settings = {};
+    async #parse(settings) {
+        const _settings = {};
 
         let current_module = DEFAULT_MODULE;
         let current_multiline_key = null;
 
-        for (const line of string.replaceAll(`\r${LINE_SEPARATOR}`, LINE_SEPARATOR).replaceAll("\r", LINE_SEPARATOR).split(LINE_SEPARATOR)) {
+        for (const line of settings.replaceAll(`\r${LINE_SEPARATOR}`, LINE_SEPARATOR).replaceAll("\r", LINE_SEPARATOR).split(LINE_SEPARATOR)) {
             const _line = this.#removeComments(
                 line
             );
@@ -235,7 +101,7 @@ export class FluxIniFileSettingsStorage {
             if (current_multiline_key !== null) {
                 const key = current_multiline_key;
 
-                let value = `${settings[current_module][key]}${_line}`;
+                let value = `${_settings[current_module][key]}${_line}`;
 
                 if (this.#isEndEscaped(
                     _line
@@ -249,7 +115,7 @@ export class FluxIniFileSettingsStorage {
                     current_multiline_key = null;
                 }
 
-                settings[current_module][key] = value;
+                _settings[current_module][key] = value;
                 continue;
             }
 
@@ -287,13 +153,13 @@ export class FluxIniFileSettingsStorage {
                     );
                 }
 
-                settings[current_module] ??= {};
+                _settings[current_module] ??= {};
 
-                settings[current_module][_key] = value;
+                _settings[current_module][_key] = value;
             }
         }
 
-        return settings;
+        return _settings;
     }
 
     /**

@@ -6,6 +6,14 @@ Changes:
 
 \-
 
+## v2023-09-22-1
+
+Changes:
+
+- Rename `deleteAll`, `getAll` and `storeAll`
+- `FluxStringifyValueSettingsStorage`
+- `FluxDefaultValueTypeSettingsStorage`
+
 ## v2023-09-21-1
 
 Changes:

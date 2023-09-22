@@ -1,5 +1,6 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
+/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
@@ -18,7 +19,7 @@ export class FluxWebStorageSettingsStorage {
     /**
      * @param {string} key_prefix
      * @param {boolean | null} session
-     * @returns {FluxWebStorageSettingsStorage | null}
+     * @returns {SettingsStorage | null}
      */
     static new(key_prefix, session = null) {
         const flux_web_storage_settings_storage = new this(
@@ -55,10 +56,22 @@ export class FluxWebStorageSettingsStorage {
     }
 
     /**
+     * @returns {Promise<void>}
+     */
+    async deleteAll() {
+        for (const value of this.#getAll()) {
+            await this.delete(
+                value.key,
+                value.module
+            );
+        }
+    }
+
+    /**
      * @param {string | null} module
      * @returns {Promise<void>}
      */
-    async deleteAll(module = null) {
+    async deleteAllByModule(module = null) {
         for (const value of this.#getAll(
             module ?? DEFAULT_MODULE
         )) {
@@ -70,54 +83,32 @@ export class FluxWebStorageSettingsStorage {
     }
 
     /**
-     * @returns {Promise<void>}
-     */
-    async deleteAllModules() {
-        for (const value of this.#getAll()) {
-            await this.delete(
-                value.key,
-                value.module
-            );
-        }
-    }
-
-    /**
      * @param {string} key
-     * @param {*} default_value
+     * @param {string | null} default_value
      * @param {string | null} module
-     * @returns {Promise<*>}
+     * @returns {Promise<string | null>}
      */
     async get(key, default_value = null, module = null) {
-        const value = this.#storage.getItem(this.#getKey(
+        return this.#storage.getItem(this.#getKey(
             module,
             key
-        ));
+        )) ?? default_value;
+    }
 
-        if (value === null) {
-            return default_value;
-        }
-
-        return JSON.parse(value) ?? default_value;
+    /**
+     * @returns {Promise<Value[]>}
+     */
+    async getAll() {
+        return this.#getAll();
     }
 
     /**
      * @param {string | null} module
      * @returns {Promise<Value[]>}
      */
-    async getAll(module = null) {
+    async getAllByModule(module = null) {
         return this.#getAll(
-            module ?? DEFAULT_MODULE,
-            true
-        );
-    }
-
-    /**
-     * @returns {Promise<Value[]>}
-     */
-    async getAllModules() {
-        return this.#getAll(
-            null,
-            true
+            module ?? DEFAULT_MODULE
         );
     }
 
@@ -135,7 +126,7 @@ export class FluxWebStorageSettingsStorage {
 
     /**
      * @param {string} key
-     * @param {*} value
+     * @param {string} value
      * @param {string | null} module
      * @returns {Promise<void>}
      */
@@ -143,14 +134,14 @@ export class FluxWebStorageSettingsStorage {
         this.#storage.setItem(this.#getKey(
             module,
             key
-        ), JSON.stringify(value));
+        ), value);
     }
 
     /**
      * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
-    async storeAll(values) {
+    async storeMultiple(values) {
         for (const value of values) {
             await this.store(
                 value.key,
@@ -162,12 +153,9 @@ export class FluxWebStorageSettingsStorage {
 
     /**
      * @param {string | null} module
-     * @param {boolean | null} parse
      * @returns {Value[]}
      */
-    #getAll(module = null, parse = null) {
-        const _parse = parse ?? false;
-
+    #getAll(module = null) {
         const values = Object.entries({
             ...this.#storage
         }).filter(([
@@ -185,7 +173,7 @@ export class FluxWebStorageSettingsStorage {
             return {
                 module: _module,
                 key: _key.join(KEY_SEPARATOR),
-                value: _parse ? JSON.parse(value) : value
+                value
             };
         });
 

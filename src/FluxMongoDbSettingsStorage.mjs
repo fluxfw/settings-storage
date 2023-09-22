@@ -1,6 +1,7 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 /** @typedef {import("mongodb").Collection} Collection */
+/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
@@ -12,7 +13,7 @@ export class FluxMongoDbSettingsStorage {
 
     /**
      * @param {Collection} collection
-     * @returns {FluxMongoDbSettingsStorage}
+     * @returns {SettingsStorage}
      */
     static new(collection) {
         return new this(
@@ -41,20 +42,20 @@ export class FluxMongoDbSettingsStorage {
     }
 
     /**
-     * @param {string | null} module
      * @returns {Promise<void>}
      */
-    async deleteAll(module = null) {
-        await this.#collection.deleteMany({
-            module: module ?? DEFAULT_MODULE
-        });
+    async deleteAll() {
+        await this.#collection.deleteMany();
     }
 
     /**
+     * @param {string | null} module
      * @returns {Promise<void>}
      */
-    async deleteAllModules() {
-        await this.#collection.deleteMany();
+    async deleteAllByModule(module = null) {
+        await this.#collection.deleteMany({
+            module: module ?? DEFAULT_MODULE
+        });
     }
 
     /**
@@ -71,13 +72,10 @@ export class FluxMongoDbSettingsStorage {
     }
 
     /**
-     * @param {string | null} module
      * @returns {Promise<Value[]>}
      */
-    async getAll(module = null) {
-        return this.#collection.find({
-            module: module ?? DEFAULT_MODULE
-        }).map(value => ({
+    async getAll() {
+        return this.#collection.find().map(value => ({
             module: value.module,
             key: value.key,
             value: value.value
@@ -85,10 +83,13 @@ export class FluxMongoDbSettingsStorage {
     }
 
     /**
+     * @param {string | null} module
      * @returns {Promise<Value[]>}
      */
-    async getAllModules() {
-        return this.#collection.find().map(value => ({
+    async getAllByModule(module = null) {
+        return this.#collection.find({
+            module: module ?? DEFAULT_MODULE
+        }).map(value => ({
             module: value.module,
             key: value.key,
             value: value.value
@@ -132,7 +133,7 @@ export class FluxMongoDbSettingsStorage {
      * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
-    async storeAll(values) {
+    async storeMultiple(values) {
         for (const value of values) {
             await this.store(
                 value.key,

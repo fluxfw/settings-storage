@@ -1,8 +1,8 @@
-/** @typedef {import("./FluxReadWriteSettingsStorage.mjs").FluxReadWriteSettingsStorage} FluxReadWriteSettingsStorage */
+/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 
 export class FluxMemorySettingsStorage {
     /**
-     * @returns {Promise<FluxReadWriteSettingsStorage>}
+     * @returns {Promise<SettingsStorage>}
      */
     static async new() {
         return (await import("./FluxReadWriteSettingsStorage.mjs")).FluxReadWriteSettingsStorage.new(

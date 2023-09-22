@@ -1,39 +1,45 @@
-import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
-
 /** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
-export class FluxDefaultModuleSettingsStorage {
-    /**
-     * @type {string}
-     */
-    #default_module;
+export class FluxStringifyValueSettingsStorage {
     /**
      * @type {SettingsStorage}
      */
     #settings_storage;
+    /**
+     * @type {(value: string) => Promise<*>}
+     */
+    #_parse;
+    /**
+     * @type {(value: *) => Promise<string>}
+     */
+    #_stringify;
 
     /**
      * @param {SettingsStorage} settings_storage
-     * @param {string | null} default_module
+     * @param {(value: *) => Promise<string>} stringify
+     * @param {(value: string) => Promise<*>} parse
      * @returns {SettingsStorage}
      */
-    static new(settings_storage, default_module = null) {
+    static new(settings_storage, stringify, parse) {
         return new this(
             settings_storage,
-            default_module ?? DEFAULT_MODULE
+            stringify,
+            parse
         );
     }
 
     /**
      * @param {SettingsStorage} settings_storage
-     * @param {string} default_module
+     * @param {(value: *) => Promise<string>} stringify
+     * @param {(value: string) => Promise<*>} parse
      * @private
      */
-    constructor(settings_storage, default_module) {
+    constructor(settings_storage, stringify, parse) {
         this.#settings_storage = settings_storage;
-        this.#default_module = default_module;
+        this.#_stringify = stringify;
+        this.#_parse = parse;
     }
 
     /**
@@ -44,9 +50,7 @@ export class FluxDefaultModuleSettingsStorage {
     async delete(key, module = null) {
         await this.#settings_storage.delete(
             key,
-            this.#getModule(
-                module
-            )
+            module
         );
     }
 
@@ -63,9 +67,7 @@ export class FluxDefaultModuleSettingsStorage {
      */
     async deleteAllByModule(module = null) {
         await this.#settings_storage.deleteAllByModule(
-            this.#getModule(
-                module
-            )
+            module
         );
     }
 
@@ -76,12 +78,13 @@ export class FluxDefaultModuleSettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        return this.#settings_storage.get(
-            key,
-            default_value,
-            this.#getModule(
+        return this.#parse(
+            await this.#settings_storage.get(
+                key,
+                null,
                 module
-            )
+            ),
+            default_value
         );
     }
 
@@ -89,7 +92,18 @@ export class FluxDefaultModuleSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAll() {
-        return this.#settings_storage.getAll();
+        const values = [];
+
+        for (const value of await this.#settings_storage.getAll()) {
+            values.push({
+                ...value,
+                value: await this.#parse(
+                    value.value
+                )
+            });
+        }
+
+        return values;
     }
 
     /**
@@ -97,11 +111,20 @@ export class FluxDefaultModuleSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAllByModule(module = null) {
-        return this.#settings_storage.getAllByModule(
-            this.#getModule(
-                module
-            )
-        );
+        const values = [];
+
+        for (const value of await this.#settings_storage.getAllByModule(
+            module
+        )) {
+            values.push({
+                ...value,
+                value: await this.#parse(
+                    value.value
+                )
+            });
+        }
+
+        return values;
     }
 
     /**
@@ -112,9 +135,7 @@ export class FluxDefaultModuleSettingsStorage {
     async has(key, module = null) {
         return this.#settings_storage.has(
             key,
-            this.#getModule(
-                module
-            )
+            module
         );
     }
 
@@ -127,10 +148,10 @@ export class FluxDefaultModuleSettingsStorage {
     async store(key, value, module = null) {
         await this.#settings_storage.store(
             key,
-            value,
-            this.#getModule(
-                module
-            )
+            await this.#stringify(
+                value
+            ),
+            module
         );
     }
 
@@ -139,16 +160,44 @@ export class FluxDefaultModuleSettingsStorage {
      * @returns {Promise<void>}
      */
     async storeMultiple(values) {
+        const _values = [];
+
+        for (const value of values) {
+            _values.push({
+                ...value,
+                value: await this.#stringify(
+                    value.value
+                )
+            });
+        }
+
         await this.#settings_storage.storeMultiple(
-            values
+            _values
         );
     }
 
     /**
-     * @param {string| null} module
-     * @returns {string}
+     * @param {string | null} value
+     * @param {*} default_value
+     * @returns {Promise<*>}
      */
-    #getModule(module) {
-        return module ?? this.#default_module;
+    async #parse(value = null, default_value = null) {
+        if (value === null) {
+            return default_value;
+        }
+
+        return await this.#_parse(
+            value
+        ) ?? default_value;
+    }
+
+    /**
+     * @param {*} value
+     * @returns {Promise<string>}
+     */
+    async #stringify(value) {
+        return this.#_stringify(
+            value
+        );
     }
 }

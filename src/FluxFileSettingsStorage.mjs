@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 
-/** @typedef {import("./FluxReadWriteSettingsStorage.mjs").FluxReadWriteSettingsStorage} FluxReadWriteSettingsStorage */
 /** @typedef {import("./Settings.mjs").Settings} Settings */
+/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 
 export class FluxFileSettingsStorage {
     /**
@@ -10,11 +10,7 @@ export class FluxFileSettingsStorage {
      */
     #file_path;
     /**
-     * @type {FluxReadWriteSettingsStorage}
-     */
-    #flux_read_write_settings_storage;
-    /**
-     * @type {(string: string) => Promise<Settings>}
+     * @type {(settings: string) => Promise<Settings>}
      */
     #parse;
     /**
@@ -24,46 +20,37 @@ export class FluxFileSettingsStorage {
 
     /**
      * @param {string} file_path
-     * @param {(string: string) => Promise<Settings>} parse
      * @param {(settings: Settings) => Promise<string>} stringify
-     * @returns {Promise<FluxReadWriteSettingsStorage>}
+     * @param {(settings: string) => Promise<Settings>} parse
+     * @returns {Promise<SettingsStorage>}
      */
-    static async new(file_path, parse, stringify) {
+    static async new(file_path, stringify, parse) {
         const flux_file_settings_storage = new this(
             file_path,
-            parse,
-            stringify
+            stringify,
+            parse
         );
 
-        await flux_file_settings_storage.#init();
-
-        return flux_file_settings_storage.#flux_read_write_settings_storage;
-    }
-
-    /**
-     * @param {string} file_path
-     * @param {(string: string) => Promise<Settings>} parse
-     * @param {(settings: Settings) => Promise<string>} stringify
-     * @private
-     */
-    constructor(file_path, parse, stringify) {
-        this.#file_path = file_path;
-        this.#parse = parse;
-        this.#stringify = stringify;
-    }
-
-    /**
-     * @returns {Promise<void>}
-     */
-    async #init() {
-        this.#flux_read_write_settings_storage = await (await import("./FluxReadWriteSettingsStorage.mjs")).FluxReadWriteSettingsStorage.new(
-            async () => this.#read(),
+        return (await import("./FluxReadWriteSettingsStorage.mjs")).FluxReadWriteSettingsStorage.new(
+            async () => flux_file_settings_storage.#read(),
             async settings => {
-                await this.#write(
+                await flux_file_settings_storage.#write(
                     settings
                 );
             }
         );
+    }
+
+    /**
+     * @param {string} file_path
+     * @param {(settings: Settings) => Promise<string>} stringify
+     * @param {(settings: string) => Promise<Settings>} parse
+     * @private
+     */
+    constructor(file_path, stringify, parse) {
+        this.#file_path = file_path;
+        this.#stringify = stringify;
+        this.#parse = parse;
     }
 
     /**

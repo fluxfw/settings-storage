@@ -1,6 +1,7 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 /** @typedef {import("./Settings.mjs").Settings} Settings */
+/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
@@ -21,7 +22,7 @@ export class FluxReadWriteSettingsStorage {
     /**
      * @param {() => Promise<Settings>} read
      * @param {(settings: Settings) => Promise<void>} write
-     * @returns {Promise<FluxReadWriteSettingsStorage>}
+     * @returns {Promise<SettingsStorage>}
      */
     static async new(read, write) {
         const flux_read_write_settings_storage = new this(
@@ -56,20 +57,20 @@ export class FluxReadWriteSettingsStorage {
     }
 
     /**
-     * @param {string | null} module
      * @returns {Promise<void>}
      */
-    async deleteAll(module = null) {
-        delete this.#settings[module ?? DEFAULT_MODULE];
+    async deleteAll() {
+        this.#settings = {};
 
         await this.#write();
     }
 
     /**
+     * @param {string | null} module
      * @returns {Promise<void>}
      */
-    async deleteAllModules() {
-        this.#settings = {};
+    async deleteAllByModule(module = null) {
+        delete this.#settings[module ?? DEFAULT_MODULE];
 
         await this.#write();
     }
@@ -85,29 +86,9 @@ export class FluxReadWriteSettingsStorage {
     }
 
     /**
-     * @param {string | null} module
      * @returns {Promise<Value[]>}
      */
-    async getAll(module = null) {
-        const _module = module ?? DEFAULT_MODULE;
-
-        return Object.entries(this.#settings[_module] ?? {}).reduce((settings, [
-            key,
-            value
-        ]) => [
-                ...settings,
-                {
-                    module: _module,
-                    key,
-                    value: structuredClone(value)
-                }
-            ], []);
-    }
-
-    /**
-     * @returns {Promise<Value[]>}
-     */
-    async getAllModules() {
+    async getAll() {
         return Object.entries(this.#settings).reduce((settings, [
             module,
             keys
@@ -122,6 +103,26 @@ export class FluxReadWriteSettingsStorage {
                     value: structuredClone(value)
                 }
             ], settings), []);
+    }
+
+    /**
+     * @param {string | null} module
+     * @returns {Promise<Value[]>}
+     */
+    async getAllByModule(module = null) {
+        const _module = module ?? DEFAULT_MODULE;
+
+        return Object.entries(this.#settings[_module] ?? {}).reduce((settings, [
+            key,
+            value
+        ]) => [
+                ...settings,
+                {
+                    module: _module,
+                    key,
+                    value: structuredClone(value)
+                }
+            ], []);
     }
 
     /**
@@ -153,7 +154,7 @@ export class FluxReadWriteSettingsStorage {
      * @param {StoreValue[]} values
      * @returns {Promise<void>}
      */
-    async storeAll(values) {
+    async storeMultiple(values) {
         if (values.length === 0) {
             return;
         }
