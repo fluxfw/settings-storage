@@ -117,7 +117,7 @@ export class FluxIndexedDBSettingsStorage {
      */
     async getAll() {
         return this.#requestToPromise(
-            (await this.#getSettingsStore()).getAllByModule()
+            (await this.#getSettingsStore()).getAll()
         );
     }
 
@@ -127,7 +127,7 @@ export class FluxIndexedDBSettingsStorage {
      */
     async getAllByModule(module = null) {
         return this.#requestToPromise(
-            (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAllByModule(module ?? DEFAULT_MODULE)
+            (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAll(module ?? DEFAULT_MODULE)
         );
     }
 
