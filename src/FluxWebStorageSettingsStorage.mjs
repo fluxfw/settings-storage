@@ -66,6 +66,10 @@ export class FluxWebStorageSettingsStorage {
      * @returns {SettingsStorage | null}
      */
     static new(key_prefix, session = null) {
+        if (key_prefix.includes(KEY_SEPARATOR)) {
+            throw new Error("Invalid key prefix");
+        }
+
         const settings_storage = new this(
             key_prefix
         );
@@ -234,6 +238,10 @@ export class FluxWebStorageSettingsStorage {
      * @returns {string}
      */
     #getKey(module, key) {
+        if (module?.includes(KEY_SEPARATOR) ?? false) {
+            throw new Error("Invalid module");
+        }
+
         return [
             this.#key_prefix,
             module ?? DEFAULT_MODULE,
