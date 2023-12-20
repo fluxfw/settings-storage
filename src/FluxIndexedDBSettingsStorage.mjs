@@ -16,9 +16,9 @@ const STORE_NAME_SETTINGS = "settings";
 
 export class FluxIndexedDBSettingsStorage {
     /**
-     * @type {IDBDatabase}
+     * @type {IDBDatabase | null}
      */
-    #database;
+    #database = null;
     /**
      * @type {string}
      */
@@ -68,6 +68,10 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async delete(key, module = null) {
+        if (this.#database === null) {
+            return;
+        }
+
         await this.#requestToPromise(
             (await this.#getSettingsStore(
                 true
@@ -82,6 +86,10 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAll() {
+        if (this.#database === null) {
+            return;
+        }
+
         await this.#requestToPromise(
             (await this.#getSettingsStore(
                 true
@@ -94,6 +102,10 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async deleteAllByModule(module = null) {
+        if (this.#database === null) {
+            return;
+        }
+
         const store = await this.#getSettingsStore(
             true
         );
@@ -114,6 +126,10 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
+        if (this.#database === null) {
+            return default_value;
+        }
+
         return (await this.#requestToPromise(
             (await this.#getSettingsStore()).get([
                 module ?? DEFAULT_MODULE,
@@ -126,6 +142,10 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAll() {
+        if (this.#database === null) {
+            return [];
+        }
+
         return this.#requestToPromise(
             (await this.#getSettingsStore()).getAll()
         );
@@ -136,6 +156,10 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAllByModule(module = null) {
+        if (this.#database === null) {
+            return [];
+        }
+
         return this.#requestToPromise(
             (await this.#getSettingsStore()).index(INDEX_NAME_MODULE).getAll(module ?? DEFAULT_MODULE)
         );
@@ -147,6 +171,10 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<boolean>}
      */
     async has(key, module = null) {
+        if (this.#database === null) {
+            return false;
+        }
+
         return await this.#requestToPromise(
             (await this.#getSettingsStore()).openCursor([
                 module ?? DEFAULT_MODULE,
@@ -162,6 +190,12 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async store(key, value, module = null) {
+        if (this.#database === null) {
+            await this.#initDatabase(
+                true
+            );
+        }
+
         await this.#requestToPromise(
             (await this.#getSettingsStore(
                 true
@@ -178,6 +212,12 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<void>}
      */
     async storeMultiple(values) {
+        if (this.#database === null) {
+            await this.#initDatabase(
+                true
+            );
+        }
+
         for (const value of values) {
             await this.store(
                 value.key,
@@ -233,15 +273,21 @@ export class FluxIndexedDBSettingsStorage {
      * @returns {Promise<IDBObjectStore>}
      */
     async #getStore(name, write = null) {
-        const transaction = this.#upgrade_transaction ?? this.#database.transaction(name, write ?? false ? "readwrite" : "readonly");
+        let transaction;
 
-        transaction.addEventListener("abort", e => {
-            console.error(e, transaction.error);
-        });
+        if (this.#upgrade_transaction !== null) {
+            transaction = this.#upgrade_transaction;
+        } else {
+            transaction = this.#database.transaction(name, write ?? false ? "readwrite" : "readonly");
 
-        transaction.addEventListener("error", e => {
-            console.error(e, transaction.error);
-        });
+            transaction.addEventListener("abort", e => {
+                console.error(e, transaction.error);
+            });
+
+            transaction.addEventListener("error", e => {
+                console.error(e, transaction.error);
+            });
+        }
 
         return transaction.objectStore(name);
     }
@@ -254,13 +300,22 @@ export class FluxIndexedDBSettingsStorage {
     }
 
     /**
+     * @param {boolean | null} store
      * @returns {Promise<boolean>}
      */
-    async #initDatabase() {
+    async #initDatabase(store = null) {
+        if (this.#database !== null) {
+            return true;
+        }
+
         try {
             if ((globalThis.indexedDB?.open ?? null) === null) {
                 console.info("indexedDB is not available");
                 return false;
+            }
+
+            if (!(store ?? false) && (indexedDB.databases ?? null) !== null && !(await indexedDB.databases()).some(database => database.name === this.#database_name)) {
+                return true;
             }
 
             const request = indexedDB.open(this.#database_name, DATABASE_VERSION_CURRENT);
@@ -275,6 +330,14 @@ export class FluxIndexedDBSettingsStorage {
                 }
 
                 this.#database = request.result;
+
+                request.transaction.addEventListener("abort", _e => {
+                    console.error(_e, request.transaction.error);
+                });
+
+                request.transaction.addEventListener("error", _e => {
+                    console.error(_e, request.transaction.error);
+                });
                 this.#upgrade_transaction = request.transaction;
 
                 let version_1_values = null;

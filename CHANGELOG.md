@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2023-12-20-1
+
+Changes:
+
+- Only create indexDB on store (Not possible on Firefox based browsers)
+
 ## v2023-11-16-1
 
 Changes:
