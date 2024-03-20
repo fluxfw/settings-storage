@@ -17,9 +17,9 @@ export class FluxDefaultModuleSettingsStorage {
     /**
      * @param {SettingsStorage} settings_storage
      * @param {string | null} default_module
-     * @returns {SettingsStorage}
+     * @returns {Promise<SettingsStorage>}
      */
-    static new(settings_storage, default_module = null) {
+    static async new(settings_storage, default_module = null) {
         return new this(
             settings_storage,
             default_module ?? DEFAULT_MODULE

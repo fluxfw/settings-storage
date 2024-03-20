@@ -10,9 +10,9 @@ export class FluxDefaultValueTypeSettingsStorage {
 
     /**
      * @param {SettingsStorage} settings_storage
-     * @returns {SettingsStorage}
+     * @returns {Promise<SettingsStorage>}
      */
-    static new(settings_storage) {
+    static async new(settings_storage) {
         return new this(
             settings_storage
         );

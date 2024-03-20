@@ -22,7 +22,7 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<SettingsStorage | null>}
      */
     static async newWithJsonStringifyValue(key_prefix, session = null) {
-        const settings_storage = this.new(
+        const settings_storage = await this.new(
             key_prefix,
             session
         );
@@ -54,7 +54,7 @@ export class FluxWebStorageSettingsStorage {
      * @returns {Promise<SettingsStorage>}
      */
     static async newWithMemoryFallback(key_prefix, session = null) {
-        return this.new(
+        return await this.new(
             key_prefix,
             session
         ) ?? (await import("./FluxMemorySettingsStorage.mjs")).FluxMemorySettingsStorage.new();
@@ -63,9 +63,9 @@ export class FluxWebStorageSettingsStorage {
     /**
      * @param {string} key_prefix
      * @param {boolean | null} session
-     * @returns {SettingsStorage | null}
+     * @returns {Promise<SettingsStorage | null>}
      */
-    static new(key_prefix, session = null) {
+    static async new(key_prefix, session = null) {
         if (key_prefix.includes(KEY_SEPARATOR)) {
             throw new Error("Invalid key prefix");
         }

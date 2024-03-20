@@ -20,9 +20,9 @@ export class FluxStringifyValueSettingsStorage {
      * @param {SettingsStorage} settings_storage
      * @param {(value: *) => Promise<string>} stringify
      * @param {(value: string) => Promise<*>} parse
-     * @returns {SettingsStorage}
+     * @returns {Promise<SettingsStorage>}
      */
-    static new(settings_storage, stringify, parse) {
+    static async new(settings_storage, stringify, parse) {
         return new this(
             settings_storage,
             stringify,

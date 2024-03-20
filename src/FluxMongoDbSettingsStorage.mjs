@@ -13,9 +13,9 @@ export class FluxMongoDbSettingsStorage {
 
     /**
      * @param {Collection} collection
-     * @returns {SettingsStorage}
+     * @returns {Promise<SettingsStorage>}
      */
-    static new(collection) {
+    static async new(collection) {
         return new this(
             collection
         );
