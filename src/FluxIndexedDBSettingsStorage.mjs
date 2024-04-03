@@ -310,7 +310,7 @@ export class FluxIndexedDBSettingsStorage {
 
         try {
             if ((globalThis.indexedDB?.open ?? null) === null) {
-                console.info("indexedDB is not available");
+                console.info("indexedDB is not available!");
                 return false;
             }
 
@@ -380,7 +380,7 @@ export class FluxIndexedDBSettingsStorage {
                 console.error(e);
             });
         } catch (error) {
-            console.error("Init database failed (", error, ")");
+            console.error("Init database failed (", error, ")!");
             return false;
         }
 

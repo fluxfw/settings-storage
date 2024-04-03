@@ -67,7 +67,7 @@ export class FluxWebStorageSettingsStorage {
      */
     static async new(key_prefix, session = null) {
         if (key_prefix.includes(KEY_SEPARATOR)) {
-            throw new Error("Invalid key prefix");
+            throw new Error("Invalid key prefix!");
         }
 
         const settings_storage = new this(
@@ -239,7 +239,7 @@ export class FluxWebStorageSettingsStorage {
      */
     #getKey(module, key) {
         if (module?.includes(KEY_SEPARATOR) ?? false) {
-            throw new Error("Invalid module");
+            throw new Error("Invalid module!");
         }
 
         return [
@@ -268,13 +268,13 @@ export class FluxWebStorageSettingsStorage {
             const key = session ?? false ? "sessionStorage" : "localStorage";
 
             if ((globalThis[key]?.getItem ?? null) === null) {
-                console.info(`${key} is not available`);
+                console.info(`${key} is not available!`);
                 return false;
             }
 
             this.#storage = globalThis[key];
         } catch (error) {
-            console.error("Init storage failed (", error, ")");
+            console.error("Init storage failed (", error, ")!");
             return false;
         }
 

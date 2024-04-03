@@ -89,20 +89,17 @@ export class FluxReadWriteSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAll() {
-        return Object.entries(this.#settings).reduce((settings, [
+        return Object.entries(this.#settings).flatMap(([
             module,
-            keys
-        ]) => Object.entries(keys).reduce((_settings, [
+            values
+        ]) => Object.entries(values).map(([
             key,
             value
-        ]) => [
-                ..._settings,
-                {
-                    module,
-                    key,
-                    value: structuredClone(value)
-                }
-            ], settings), []);
+        ]) => ({
+            module,
+            key,
+            value: structuredClone(value)
+        })));
     }
 
     /**
@@ -112,17 +109,14 @@ export class FluxReadWriteSettingsStorage {
     async getAllByModule(module = null) {
         const _module = module ?? DEFAULT_MODULE;
 
-        return Object.entries(this.#settings[_module] ?? {}).reduce((settings, [
+        return Object.entries(this.#settings[_module] ?? {}).map(([
             key,
             value
-        ]) => [
-                ...settings,
-                {
-                    module: _module,
-                    key,
-                    value: structuredClone(value)
-                }
-            ], []);
+        ]) => ({
+            module: _module,
+            key,
+            value: structuredClone(value)
+        }));
     }
 
     /**
