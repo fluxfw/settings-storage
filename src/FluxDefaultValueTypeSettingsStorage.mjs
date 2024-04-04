@@ -173,9 +173,9 @@ export class FluxDefaultValueTypeSettingsStorage {
 
             case "number":
                 if (/^-?\d+(\.\d+)?$/.test(value)) {
-                    const _value = parseFloat(value);
-                    if (!Number.isNaN(_value)) {
-                        return _value;
+                    const number = parseFloat(value);
+                    if (Number.isFinite(number)) {
+                        return number;
                     }
                 }
                 return value;

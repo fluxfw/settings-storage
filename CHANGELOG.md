@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-04-04-2
+
+Changes:
+
+- Replace `isNaN` with `isFinite`
+
 ## v2024-04-04-1
 
 Changes:
