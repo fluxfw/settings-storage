@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-04-04-1
+
+Changes:
+
+- Remove unneded `isNaN`
+
 ## v2024-04-03-1
 
 Changes:
