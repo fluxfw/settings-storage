@@ -1,5 +1,6 @@
+import { dirname } from "node:path";
 import { existsSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 
 /** @typedef {import("./Settings.mjs").Settings} Settings */
 /** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
@@ -67,6 +68,10 @@ export class FluxFileSettingsStorage {
      * @returns {Promise<void>}
      */
     async #write(settings) {
+        await mkdir(dirname(this.#file_path), {
+            recursive: true
+        });
+
         await writeFile(this.#file_path, await this.#stringify(
             settings
         ));
