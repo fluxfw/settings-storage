@@ -5,7 +5,7 @@ import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
-export class FluxMongoDbSettingsStorage {
+export class MongoDbSettingsStorage {
     /**
      * @type {Collection}
      */

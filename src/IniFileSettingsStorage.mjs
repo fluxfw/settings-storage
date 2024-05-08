@@ -31,13 +31,13 @@ const ESCAPE_CHARS = Object.freeze([
     ":"
 ]);
 
-export class FluxIniFileSettingsStorage {
+export class IniFileSettingsStorage {
     /**
      * @param {string} file_path
      * @returns {Promise<SettingsStorage>}
      */
     static async newWithDefaultValueType(file_path) {
-        return (await import("./FluxDefaultValueTypeSettingsStorage.mjs")).FluxDefaultValueTypeSettingsStorage.new(
+        return (await import("./DefaultValueTypeSettingsStorage.mjs")).DefaultValueTypeSettingsStorage.new(
             await this.new(
                 file_path
             )
@@ -49,7 +49,7 @@ export class FluxIniFileSettingsStorage {
      * @returns {Promise<SettingsStorage>}
      */
     static async newWithJsonStringifyValue(file_path) {
-        return (await import("./FluxJsonStringifyValueSettingsStorage.mjs")).FluxJsonStringifyValueSettingsStorage.new(
+        return (await import("./JsonStringifyValueSettingsStorage.mjs")).JsonStringifyValueSettingsStorage.new(
             await this.new(
                 file_path
             )
@@ -63,7 +63,7 @@ export class FluxIniFileSettingsStorage {
     static async new(file_path) {
         const settings_storage = new this();
 
-        return (await import("./FluxFileSettingsStorage.mjs")).FluxFileSettingsStorage.new(
+        return (await import("./FileSettingsStorage.mjs")).FileSettingsStorage.new(
             file_path,
             async settings => settings_storage.#stringify(
                 settings

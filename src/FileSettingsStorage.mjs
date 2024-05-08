@@ -5,7 +5,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 /** @typedef {import("./Settings.mjs").Settings} Settings */
 /** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 
-export class FluxFileSettingsStorage {
+export class FileSettingsStorage {
     /**
      * @type {string}
      */
@@ -32,7 +32,7 @@ export class FluxFileSettingsStorage {
             parse
         );
 
-        return (await import("./FluxReadWriteSettingsStorage.mjs")).FluxReadWriteSettingsStorage.new(
+        return (await import("./ReadWriteSettingsStorage.mjs")).ReadWriteSettingsStorage.new(
             async () => settings_storage.#read(),
             async settings => {
                 await settings_storage.#write(

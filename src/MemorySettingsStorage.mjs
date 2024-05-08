@@ -1,11 +1,11 @@
 /** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 
-export class FluxMemorySettingsStorage {
+export class MemorySettingsStorage {
     /**
      * @returns {Promise<SettingsStorage>}
      */
     static async new() {
-        return (await import("./FluxReadWriteSettingsStorage.mjs")).FluxReadWriteSettingsStorage.new(
+        return (await import("./ReadWriteSettingsStorage.mjs")).ReadWriteSettingsStorage.new(
             async () => ({}),
             async () => { }
         );

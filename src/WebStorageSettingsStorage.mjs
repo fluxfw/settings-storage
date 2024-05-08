@@ -6,7 +6,7 @@ import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 const KEY_SEPARATOR = "____";
 
-export class FluxWebStorageSettingsStorage {
+export class WebStorageSettingsStorage {
     /**
      * @type {string}
      */
@@ -31,7 +31,7 @@ export class FluxWebStorageSettingsStorage {
             return null;
         }
 
-        return (await import("./FluxJsonStringifyValueSettingsStorage.mjs")).FluxJsonStringifyValueSettingsStorage.new(
+        return (await import("./JsonStringifyValueSettingsStorage.mjs")).JsonStringifyValueSettingsStorage.new(
             settings_storage
         );
     }
@@ -45,7 +45,7 @@ export class FluxWebStorageSettingsStorage {
         return await this.newWithJsonStringifyValue(
             key_prefix,
             session
-        ) ?? (await import("./FluxMemorySettingsStorage.mjs")).FluxMemorySettingsStorage.new();
+        ) ?? (await import("./MemorySettingsStorage.mjs")).MemorySettingsStorage.new();
     }
 
     /**
@@ -57,7 +57,7 @@ export class FluxWebStorageSettingsStorage {
         return await this.new(
             key_prefix,
             session
-        ) ?? (await import("./FluxMemorySettingsStorage.mjs")).FluxMemorySettingsStorage.new();
+        ) ?? (await import("./MemorySettingsStorage.mjs")).MemorySettingsStorage.new();
     }
 
     /**

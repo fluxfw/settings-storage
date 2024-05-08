@@ -1,8 +1,14 @@
+import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
+
 /** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
-export class FluxDefaultValueTypeSettingsStorage {
+export class DefaultModuleSettingsStorage {
+    /**
+     * @type {string}
+     */
+    #default_module;
     /**
      * @type {SettingsStorage}
      */
@@ -10,20 +16,24 @@ export class FluxDefaultValueTypeSettingsStorage {
 
     /**
      * @param {SettingsStorage} settings_storage
+     * @param {string | null} default_module
      * @returns {Promise<SettingsStorage>}
      */
-    static async new(settings_storage) {
+    static async new(settings_storage, default_module = null) {
         return new this(
-            settings_storage
+            settings_storage,
+            default_module ?? DEFAULT_MODULE
         );
     }
 
     /**
      * @param {SettingsStorage} settings_storage
+     * @param {string} default_module
      * @private
      */
-    constructor(settings_storage) {
+    constructor(settings_storage, default_module) {
         this.#settings_storage = settings_storage;
+        this.#default_module = default_module;
     }
 
     /**
@@ -34,7 +44,9 @@ export class FluxDefaultValueTypeSettingsStorage {
     async delete(key, module = null) {
         await this.#settings_storage.delete(
             key,
-            module
+            this.#getModule(
+                module
+            )
         );
     }
 
@@ -51,7 +63,9 @@ export class FluxDefaultValueTypeSettingsStorage {
      */
     async deleteAllByModule(module = null) {
         await this.#settings_storage.deleteAllByModule(
-            module
+            this.#getModule(
+                module
+            )
         );
     }
 
@@ -62,13 +76,12 @@ export class FluxDefaultValueTypeSettingsStorage {
      * @returns {Promise<*>}
      */
     async get(key, default_value = null, module = null) {
-        return this.#fromString(
-            await this.#settings_storage.get(
-                key,
-                null,
+        return this.#settings_storage.get(
+            key,
+            default_value,
+            this.#getModule(
                 module
-            ),
-            default_value
+            )
         );
     }
 
@@ -76,12 +89,7 @@ export class FluxDefaultValueTypeSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAll() {
-        return (await this.#settings_storage.getAll()).map(value => ({
-            ...value,
-            value: this.#fromString(
-                value.value
-            )
-        }));
+        return this.#settings_storage.getAll();
     }
 
     /**
@@ -89,14 +97,11 @@ export class FluxDefaultValueTypeSettingsStorage {
      * @returns {Promise<Value[]>}
      */
     async getAllByModule(module = null) {
-        return (await this.#settings_storage.getAllByModule(
-            module
-        )).map(value => ({
-            ...value,
-            value: this.#fromString(
-                value.value
+        return this.#settings_storage.getAllByModule(
+            this.#getModule(
+                module
             )
-        }));
+        );
     }
 
     /**
@@ -107,7 +112,9 @@ export class FluxDefaultValueTypeSettingsStorage {
     async has(key, module = null) {
         return this.#settings_storage.has(
             key,
-            module
+            this.#getModule(
+                module
+            )
         );
     }
 
@@ -120,10 +127,10 @@ export class FluxDefaultValueTypeSettingsStorage {
     async store(key, value, module = null) {
         await this.#settings_storage.store(
             key,
-            this.#toString(
-                value
-            ),
-            module
+            value,
+            this.#getModule(
+                module
+            )
         );
     }
 
@@ -133,63 +140,15 @@ export class FluxDefaultValueTypeSettingsStorage {
      */
     async storeMultiple(values) {
         await this.#settings_storage.storeMultiple(
-            values.map(value => ({
-                ...value,
-                value: this.#toString(
-                    value.value
-                )
-            }))
+            values
         );
     }
 
     /**
-     * @param {string | null} value
-     * @param {*} default_value
-     * @returns {*}
-     */
-    #fromString(value = null, default_value = null) {
-        if (value === null) {
-            return default_value;
-        }
-
-        switch (typeof default_value) {
-            case "boolean":
-                if ([
-                    "true",
-                    "yes",
-                    "1"
-                ].includes(value.toLowerCase())) {
-                    return true;
-                } else {
-                    if ([
-                        "false",
-                        "no",
-                        "0"
-                    ].includes(typeof value === "string" ? value.toLowerCase() : value)) {
-                        return false;
-                    }
-                }
-                return value;
-
-            case "number":
-                if (/^-?\d+(\.\d+)?$/.test(value)) {
-                    const number = parseFloat(value);
-                    if (Number.isFinite(number)) {
-                        return number;
-                    }
-                }
-                return value;
-
-            default:
-                return value;
-        }
-    }
-
-    /**
-     * @param {*} value
+     * @param {string| null} module
      * @returns {string}
      */
-    #toString(value) {
-        return `${value}`;
+    #getModule(module) {
+        return module ?? this.#default_module;
     }
 }

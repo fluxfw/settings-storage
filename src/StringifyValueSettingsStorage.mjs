@@ -2,7 +2,7 @@
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
-export class FluxStringifyValueSettingsStorage {
+export class StringifyValueSettingsStorage {
     /**
      * @type {SettingsStorage}
      */

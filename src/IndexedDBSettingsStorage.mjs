@@ -14,7 +14,7 @@ const INDEX_NAME_MODULE = "module";
 
 const STORE_NAME_SETTINGS = "settings";
 
-export class FluxIndexedDBSettingsStorage {
+export class IndexedDBSettingsStorage {
     /**
      * @type {IDBDatabase | null}
      */
@@ -35,7 +35,7 @@ export class FluxIndexedDBSettingsStorage {
     static async newWithMemoryFallback(database_name) {
         return await this.new(
             database_name
-        ) ?? (await import("./FluxMemorySettingsStorage.mjs")).FluxMemorySettingsStorage.new();
+        ) ?? (await import("./MemorySettingsStorage.mjs")).MemorySettingsStorage.new();
     }
 
     /**

@@ -1,3 +1,1 @@
-# flux-settings-storage
-
-Read and store settings storage
+# settings-storage
