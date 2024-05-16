@@ -314,7 +314,7 @@ export class IndexedDBSettingsStorage {
                 return false;
             }
 
-            if (!(store ?? false) && (indexedDB.databases ?? null) !== null && !(await indexedDB.databases()).some(database => database.name === this.#database_name)) {
+            if (!(store ?? false) && !(await indexedDB.databases()).some(database => database.name === this.#database_name)) {
                 return true;
             }
 

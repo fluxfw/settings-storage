@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-05-16-1
+
+Changes:
+
+- Firefox based browsers now supports `indexedDB.databases`
+
 ## v2024-05-08-1
 
 Changes:
