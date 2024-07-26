@@ -1,5 +1,6 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
+/** @typedef {import("./Logger/Logger.mjs").Logger} Logger */
 /** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
@@ -24,27 +25,35 @@ export class IndexedDBSettingsStorage {
      */
     #database_name;
     /**
+     * @type {Logger}
+     */
+    #logger;
+    /**
      * @type {IDBTransaction | null}
      */
     #upgrade_transaction = null;
 
     /**
      * @param {string} database_name
+     * @param {Logger | null} logger
      * @returns {Promise<SettingsStorage>}
      */
-    static async newWithMemoryFallback(database_name) {
+    static async newWithMemoryFallback(database_name, logger = null) {
         return await this.new(
-            database_name
+            database_name,
+            logger
         ) ?? (await import("./MemorySettingsStorage.mjs")).MemorySettingsStorage.new();
     }
 
     /**
      * @param {string} database_name
+     * @param {Logger | null} logger
      * @returns {Promise<SettingsStorage | null>}
      */
-    static async new(database_name) {
+    static async new(database_name, logger = null) {
         const settings_storage = new this(
-            database_name
+            database_name,
+            logger ?? console
         );
 
         if (!await settings_storage.#init()) {
@@ -56,10 +65,12 @@ export class IndexedDBSettingsStorage {
 
     /**
      * @param {string} database_name
+     * @param {Logger} logger
      * @private
      */
-    constructor(database_name) {
+    constructor(database_name, logger) {
         this.#database_name = database_name;
+        this.#logger = logger;
     }
 
     /**
@@ -281,11 +292,17 @@ export class IndexedDBSettingsStorage {
             transaction = this.#database.transaction(name, write ?? false ? "readwrite" : "readonly");
 
             transaction.addEventListener("abort", e => {
-                console.error(e, transaction.error);
+                this.#logger.error(
+                    e,
+                    transaction.error
+                );
             });
 
             transaction.addEventListener("error", e => {
-                console.error(e, transaction.error);
+                this.#logger.error(
+                    e,
+                    transaction.error
+                );
             });
         }
 
@@ -310,7 +327,9 @@ export class IndexedDBSettingsStorage {
 
         try {
             if ((globalThis.indexedDB?.open ?? null) === null) {
-                console.info("indexedDB is not available!");
+                this.#logger.info(
+                    "indexedDB is not available!"
+                );
                 return false;
             }
 
@@ -321,7 +340,9 @@ export class IndexedDBSettingsStorage {
             const request = indexedDB.open(this.#database_name, DATABASE_VERSION_CURRENT);
 
             request.addEventListener("blocked", e => {
-                console.error(e);
+                this.#logger.error(
+                    e
+                );
             });
 
             request.addEventListener("upgradeneeded", async e => {
@@ -332,11 +353,17 @@ export class IndexedDBSettingsStorage {
                 this.#database = request.result;
 
                 request.transaction.addEventListener("abort", _e => {
-                    console.error(_e, request.transaction.error);
+                    this.#logger.error(
+                        _e,
+                        request.transaction.error
+                    );
                 });
 
                 request.transaction.addEventListener("error", _e => {
-                    console.error(_e, request.transaction.error);
+                    this.#logger.error(
+                        _e,
+                        request.transaction.error
+                    );
                 });
                 this.#upgrade_transaction = request.transaction;
 
@@ -369,18 +396,28 @@ export class IndexedDBSettingsStorage {
             );
 
             this.#database.addEventListener("abort", e => {
-                console.error(e);
+                this.#logger.error(
+                    e
+                );
             });
 
             this.#database.addEventListener("error", e => {
-                console.error(e);
+                this.#logger.error(
+                    e
+                );
             });
 
             this.#database.addEventListener("versionchange", e => {
-                console.error(e);
+                this.#logger.error(
+                    e
+                );
             });
         } catch (error) {
-            console.error("Init database failed (", error, ")!");
+            this.#logger.error(
+                "Init database failed (",
+                error,
+                ")!"
+            );
             return false;
         }
 

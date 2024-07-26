@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-07-26-1
+
+Changes:
+
+- `Logger`
+
 ## v2024-07-08-1
 
 Changes:

@@ -1,5 +1,6 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
+/** @typedef {import("./Logger/Logger.mjs").Logger} Logger */
 /** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
@@ -12,18 +13,24 @@ export class WebStorageSettingsStorage {
      */
     #key_prefix;
     /**
+     * @type {Logger}
+     */
+    #logger;
+    /**
      * @type {Storage}
      */
     #storage;
 
     /**
      * @param {string} key_prefix
+     * @param {Logger | null} logger
      * @param {boolean | null} session
      * @returns {Promise<SettingsStorage | null>}
      */
-    static async newWithJsonStringifyValue(key_prefix, session = null) {
+    static async newWithJsonStringifyValue(key_prefix, logger = null, session = null) {
         const settings_storage = await this.new(
             key_prefix,
+            logger,
             session
         );
 
@@ -38,40 +45,46 @@ export class WebStorageSettingsStorage {
 
     /**
      * @param {string} key_prefix
+     * @param {Logger | null} logger
      * @param {boolean | null} session
      * @returns {Promise<SettingsStorage>}
      */
-    static async newWithJsonStringifyValueAndMemoryFallback(key_prefix, session = null) {
+    static async newWithJsonStringifyValueAndMemoryFallback(key_prefix, logger = null, session = null) {
         return await this.newWithJsonStringifyValue(
             key_prefix,
+            logger,
             session
         ) ?? (await import("./MemorySettingsStorage.mjs")).MemorySettingsStorage.new();
     }
 
     /**
      * @param {string} key_prefix
+     * @param {Logger | null} logger
      * @param {boolean | null} session
      * @returns {Promise<SettingsStorage>}
      */
-    static async newWithMemoryFallback(key_prefix, session = null) {
+    static async newWithMemoryFallback(key_prefix, logger = null, session = null) {
         return await this.new(
             key_prefix,
+            logger,
             session
         ) ?? (await import("./MemorySettingsStorage.mjs")).MemorySettingsStorage.new();
     }
 
     /**
      * @param {string} key_prefix
+     * @param {Logger | null} logger
      * @param {boolean | null} session
      * @returns {Promise<SettingsStorage | null>}
      */
-    static async new(key_prefix, session = null) {
+    static async new(key_prefix, logger = null, session = null) {
         if (key_prefix.includes(KEY_SEPARATOR)) {
             throw new Error("Invalid key prefix!");
         }
 
         const settings_storage = new this(
-            key_prefix
+            key_prefix,
+            logger ?? console
         );
 
         if (!settings_storage.#init(
@@ -85,10 +98,12 @@ export class WebStorageSettingsStorage {
 
     /**
      * @param {string} key_prefix
+     * @param {Logger} logger
      * @private
      */
-    constructor(key_prefix) {
+    constructor(key_prefix, logger) {
         this.#key_prefix = key_prefix;
+        this.#logger = logger;
     }
 
     /**
@@ -268,13 +283,19 @@ export class WebStorageSettingsStorage {
             const key = session ?? false ? "sessionStorage" : "localStorage";
 
             if ((globalThis[key]?.getItem ?? null) === null) {
-                console.info(`${key} is not available!`);
+                this.#logger.info(
+                    `${key} is not available!`
+                );
                 return false;
             }
 
             this.#storage = globalThis[key];
         } catch (error) {
-            console.error("Init storage failed (", error, ")!");
+            this.#logger.error(
+                "Init storage failed (",
+                error,
+                ")!"
+            );
             return false;
         }
 
