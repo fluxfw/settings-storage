@@ -291,16 +291,16 @@ export class IndexedDBSettingsStorage {
         } else {
             transaction = this.#database.transaction(name, write ?? false ? "readwrite" : "readonly");
 
-            transaction.addEventListener("abort", e => {
+            transaction.addEventListener("abort", event => {
                 this.#logger.error(
-                    e,
+                    event,
                     transaction.error
                 );
             });
 
-            transaction.addEventListener("error", e => {
+            transaction.addEventListener("error", event => {
                 this.#logger.error(
-                    e,
+                    event,
                     transaction.error
                 );
             });
@@ -339,36 +339,36 @@ export class IndexedDBSettingsStorage {
 
             const request = indexedDB.open(this.#database_name, DATABASE_VERSION_CURRENT);
 
-            request.addEventListener("blocked", e => {
+            request.addEventListener("blocked", event => {
                 this.#logger.error(
-                    e
+                    event
                 );
             });
 
-            request.addEventListener("upgradeneeded", async e => {
-                if (e.newVersion === null) {
+            request.addEventListener("upgradeneeded", async event => {
+                if (event.newVersion === null) {
                     return;
                 }
 
                 this.#database = request.result;
 
-                request.transaction.addEventListener("abort", _e => {
+                request.transaction.addEventListener("abort", _event => {
                     this.#logger.error(
-                        _e,
+                        _event,
                         request.transaction.error
                     );
                 });
 
-                request.transaction.addEventListener("error", _e => {
+                request.transaction.addEventListener("error", _event => {
                     this.#logger.error(
-                        _e,
+                        _event,
                         request.transaction.error
                     );
                 });
                 this.#upgrade_transaction = request.transaction;
 
                 let version_1_values = null;
-                if (e.oldVersion === DATABASE_VERSION_1) {
+                if (event.oldVersion === DATABASE_VERSION_1) {
                     version_1_values = await this.#version1GetAll();
 
                     this.#database.deleteObjectStore(STORE_NAME_SETTINGS);
@@ -395,21 +395,21 @@ export class IndexedDBSettingsStorage {
                 request
             );
 
-            this.#database.addEventListener("abort", e => {
+            this.#database.addEventListener("abort", event => {
                 this.#logger.error(
-                    e
+                    event
                 );
             });
 
-            this.#database.addEventListener("error", e => {
+            this.#database.addEventListener("error", event => {
                 this.#logger.error(
-                    e
+                    event
                 );
             });
 
-            this.#database.addEventListener("versionchange", e => {
+            this.#database.addEventListener("versionchange", event => {
                 this.#logger.error(
-                    e
+                    event
                 );
             });
         } catch (error) {
