@@ -93,7 +93,7 @@ export class IniFileSettingsStorage {
      * @param {string} value
      * @returns {string}
      */
-    #escapeRegExp(value) {
+    #escapeRegularExpression(value) {
         return value.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
@@ -102,7 +102,7 @@ export class IniFileSettingsStorage {
      * @returns {boolean}
      */
     #isEndEscaped(value) {
-        return value.match(new RegExp(`${this.#escapeRegExp(
+        return value.match(new RegExp(`${this.#escapeRegularExpression(
             ESCAPE_CHAR
         )}*$`))[0].length % 2 === 1;
     }
