@@ -1,8 +1,8 @@
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
+/** @typedef {import("./ReadWriteSettingsStorage.mjs").ReadWriteSettingsStorage} ReadWriteSettingsStorage */
 
 export class MemorySettingsStorage {
     /**
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<ReadWriteSettingsStorage>}
      */
     static async new() {
         return (await import("./ReadWriteSettingsStorage.mjs")).ReadWriteSettingsStorage.new(

@@ -17,7 +17,7 @@ export class DefaultModuleSettingsStorage {
     /**
      * @param {SettingsStorage} settings_storage
      * @param {string | null} default_module
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<DefaultModuleSettingsStorage>}
      */
     static async new(settings_storage, default_module = null) {
         return new this(

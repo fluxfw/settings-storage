@@ -1,7 +1,6 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 /** @typedef {import("./Settings.mjs").Settings} Settings */
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
@@ -22,17 +21,17 @@ export class ReadWriteSettingsStorage {
     /**
      * @param {() => Promise<Settings>} read
      * @param {(settings: Settings) => Promise<void>} write
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<ReadWriteSettingsStorage>}
      */
     static async new(read, write) {
-        const settings_storage = new this(
+        const read_write_settings_storage = new this(
             read,
             write
         );
 
-        await settings_storage.#init();
+        await read_write_settings_storage.#init();
 
-        return settings_storage;
+        return read_write_settings_storage;
     }
 
     /**

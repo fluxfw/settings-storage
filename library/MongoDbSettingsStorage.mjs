@@ -1,7 +1,6 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 /** @typedef {import("mongodb").Collection} Collection */
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
@@ -13,7 +12,7 @@ export class MongoDbSettingsStorage {
 
     /**
      * @param {Collection} collection
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<MongoDbSettingsStorage>}
      */
     static async new(collection) {
         return new this(

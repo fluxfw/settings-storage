@@ -20,7 +20,7 @@ export class StringifyValueSettingsStorage {
      * @param {SettingsStorage} settings_storage
      * @param {(value: *) => Promise<string>} stringify
      * @param {(value: string) => Promise<*>} parse
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<StringifyValueSettingsStorage>}
      */
     static async new(settings_storage, stringify, parse) {
         return new this(

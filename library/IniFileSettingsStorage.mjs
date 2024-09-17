@@ -1,7 +1,9 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
+/** @typedef {import("./DefaultValueTypeSettingsStorage.mjs").DefaultValueTypeSettingsStorage} DefaultValueTypeSettingsStorage */
+/** @typedef {import("./ReadWriteSettingsStorage.mjs").ReadWriteSettingsStorage} ReadWriteSettingsStorage */
 /** @typedef {import("./Settings.mjs").Settings} Settings */
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
+/** @typedef {import("./StringifyValueSettingsStorage.mjs").StringifyValueSettingsStorage} StringifyValueSettingsStorage */
 
 const COMMENT_1 = ";";
 
@@ -34,7 +36,7 @@ const ESCAPE_CHARS = Object.freeze([
 export class IniFileSettingsStorage {
     /**
      * @param {string} file_path
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<DefaultValueTypeSettingsStorage>}
      */
     static async newWithDefaultValueType(file_path) {
         return (await import("./DefaultValueTypeSettingsStorage.mjs")).DefaultValueTypeSettingsStorage.new(
@@ -46,7 +48,7 @@ export class IniFileSettingsStorage {
 
     /**
      * @param {string} file_path
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<StringifyValueSettingsStorage>}
      */
     static async newWithJsonStringifyValue(file_path) {
         return (await import("./JsonStringifyValueSettingsStorage.mjs")).JsonStringifyValueSettingsStorage.new(
@@ -58,17 +60,17 @@ export class IniFileSettingsStorage {
 
     /**
      * @param {string} file_path
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<ReadWriteSettingsStorage>}
      */
     static async new(file_path) {
-        const settings_storage = new this();
+        const ini_file_settings_storage = new this();
 
         return (await import("./FileSettingsStorage.mjs")).FileSettingsStorage.new(
             file_path,
-            async settings => settings_storage.#stringify(
+            async settings => ini_file_settings_storage.#stringify(
                 settings
             ),
-            async settings => settings_storage.#parse(
+            async settings => ini_file_settings_storage.#parse(
                 settings
             )
         );

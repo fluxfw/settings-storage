@@ -10,7 +10,7 @@ export class DefaultValueTypeSettingsStorage {
 
     /**
      * @param {SettingsStorage} settings_storage
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<DefaultValueTypeSettingsStorage>}
      */
     static async new(settings_storage) {
         return new this(

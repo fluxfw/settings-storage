@@ -1,9 +1,9 @@
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
+/** @typedef {import("./ReadWriteSettingsStorage.mjs").ReadWriteSettingsStorage} ReadWriteSettingsStorage */
 
 export class JsonFileSettingsStorage {
     /**
      * @param {string} file_path
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<ReadWriteSettingsStorage>}
      */
     static async new(file_path) {
         return (await import("./FileSettingsStorage.mjs")).FileSettingsStorage.new(

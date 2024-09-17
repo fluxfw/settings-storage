@@ -2,8 +2,8 @@ import { dirname } from "node:path";
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 
+/** @typedef {import("./ReadWriteSettingsStorage.mjs").ReadWriteSettingsStorage} ReadWriteSettingsStorage */
 /** @typedef {import("./Settings.mjs").Settings} Settings */
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
 
 export class FileSettingsStorage {
     /**
@@ -23,19 +23,19 @@ export class FileSettingsStorage {
      * @param {string} file_path
      * @param {(settings: Settings) => Promise<string>} stringify
      * @param {(settings: string) => Promise<Settings>} parse
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<ReadWriteSettingsStorage>}
      */
     static async new(file_path, stringify, parse) {
-        const settings_storage = new this(
+        const file_settings_storage = new this(
             file_path,
             stringify,
             parse
         );
 
         return (await import("./ReadWriteSettingsStorage.mjs")).ReadWriteSettingsStorage.new(
-            async () => settings_storage.#read(),
+            async () => file_settings_storage.#read(),
             async settings => {
-                await settings_storage.#write(
+                await file_settings_storage.#write(
                     settings
                 );
             }

@@ -1,7 +1,7 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 /** @typedef {import("./Logger/Logger.mjs").Logger} Logger */
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
+/** @typedef {import("./ReadWriteSettingsStorage.mjs").ReadWriteSettingsStorage} ReadWriteSettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
 /** @typedef {import("./Value.mjs").Value} Value */
 
@@ -36,7 +36,7 @@ export class IndexedDBSettingsStorage {
     /**
      * @param {string} database_name
      * @param {Logger | null} logger
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<ReadWriteSettingsStorage>}
      */
     static async newWithMemoryFallback(database_name, logger = null) {
         return await this.new(
@@ -48,19 +48,19 @@ export class IndexedDBSettingsStorage {
     /**
      * @param {string} database_name
      * @param {Logger | null} logger
-     * @returns {Promise<SettingsStorage | null>}
+     * @returns {Promise<IndexedDBSettingsStorage | null>}
      */
     static async new(database_name, logger = null) {
-        const settings_storage = new this(
+        const index_db_settings_storage = new this(
             database_name,
             logger ?? console
         );
 
-        if (!await settings_storage.#init()) {
+        if (!await index_db_settings_storage.#init()) {
             return null;
         }
 
-        return settings_storage;
+        return index_db_settings_storage;
     }
 
     /**

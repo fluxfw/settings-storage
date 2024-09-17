@@ -1,8 +1,9 @@
 import { DEFAULT_MODULE } from "./DEFAULT_MODULE.mjs";
 
 /** @typedef {import("./Logger/Logger.mjs").Logger} Logger */
-/** @typedef {import("./SettingsStorage.mjs").SettingsStorage} SettingsStorage */
+/** @typedef {import("./ReadWriteSettingsStorage.mjs").ReadWriteSettingsStorage} ReadWriteSettingsStorage */
 /** @typedef {import("./StoreValue.mjs").StoreValue} StoreValue */
+/** @typedef {import("./StringifyValueSettingsStorage.mjs").StringifyValueSettingsStorage} StringifyValueSettingsStorage */
 /** @typedef {import("./Value.mjs").Value} Value */
 
 const KEY_SEPARATOR = "____";
@@ -25,21 +26,21 @@ export class WebStorageSettingsStorage {
      * @param {string} key_prefix
      * @param {Logger | null} logger
      * @param {boolean | null} session
-     * @returns {Promise<SettingsStorage | null>}
+     * @returns {Promise<StringifyValueSettingsStorage | null>}
      */
     static async newWithJsonStringifyValue(key_prefix, logger = null, session = null) {
-        const settings_storage = await this.new(
+        const web_storage_settings_storage = await this.new(
             key_prefix,
             logger,
             session
         );
 
-        if (settings_storage === null) {
+        if (web_storage_settings_storage === null) {
             return null;
         }
 
         return (await import("./JsonStringifyValueSettingsStorage.mjs")).JsonStringifyValueSettingsStorage.new(
-            settings_storage
+            web_storage_settings_storage
         );
     }
 
@@ -47,7 +48,7 @@ export class WebStorageSettingsStorage {
      * @param {string} key_prefix
      * @param {Logger | null} logger
      * @param {boolean | null} session
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<StringifyValueSettingsStorage | ReadWriteSettingsStorage>}
      */
     static async newWithJsonStringifyValueAndMemoryFallback(key_prefix, logger = null, session = null) {
         return await this.newWithJsonStringifyValue(
@@ -61,7 +62,7 @@ export class WebStorageSettingsStorage {
      * @param {string} key_prefix
      * @param {Logger | null} logger
      * @param {boolean | null} session
-     * @returns {Promise<SettingsStorage>}
+     * @returns {Promise<WebStorageSettingsStorage | ReadWriteSettingsStorage>}
      */
     static async newWithMemoryFallback(key_prefix, logger = null, session = null) {
         return await this.new(
@@ -75,25 +76,25 @@ export class WebStorageSettingsStorage {
      * @param {string} key_prefix
      * @param {Logger | null} logger
      * @param {boolean | null} session
-     * @returns {Promise<SettingsStorage | null>}
+     * @returns {Promise<WebStorageSettingsStorage | null>}
      */
     static async new(key_prefix, logger = null, session = null) {
         if (key_prefix.includes(KEY_SEPARATOR)) {
             throw new Error("Invalid key prefix!");
         }
 
-        const settings_storage = new this(
+        const web_storage_settings_storage = new this(
             key_prefix,
             logger ?? console
         );
 
-        if (!settings_storage.#init(
+        if (!web_storage_settings_storage.#init(
             session
         )) {
             return null;
         }
 
-        return settings_storage;
+        return web_storage_settings_storage;
     }
 
     /**

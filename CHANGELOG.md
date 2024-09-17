@@ -6,6 +6,12 @@ Changes:
 
 \-
 
+## v2024-09-17-1
+
+Changes:
+
+- Instance return types
+
 ## v2024-09-06-1
 
 Changes:
